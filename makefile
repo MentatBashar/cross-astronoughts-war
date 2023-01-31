@@ -8,7 +8,7 @@ BIN = space_wars.exe
 all: space_wars
 
 clean:
-	-rm space_wars.exe
+	-rm $(BIN)
 
 space_wars: space_wars.c
 	${CC} ${SOURCE} ${CCFLAGS} ${AL} -o ${BIN}
