@@ -49,7 +49,7 @@ ALLEGRO_VERTEX bullet_v[4];
 // COLOUR VARIABLES
 ALLEGRO_COLOR ERROR_COLOUR = { .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 
-ALLEGRO_COLOR DEBUG_COLLISION_COLOUR = { .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0};
+ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR = { .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0};
 
 ALLEGRO_COLOR P1_COLOUR = { .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
@@ -206,10 +206,10 @@ void ship_init()
   ships[1].lives = 3;
   ships[1].colour = P2_COLOUR;
 
-  ship_v[0] = (ALLEGRO_VERTEX) { .x =  8, .y =  0, .z = 0, .color = DEBUG_COLLISION_COLOUR };
-  ship_v[1] = (ALLEGRO_VERTEX) { .x = -6, .y = -4, .z = 0, .color = DEBUG_COLLISION_COLOUR };
-  ship_v[2] = (ALLEGRO_VERTEX) { .x = -8, .y =  0, .z = 0, .color = DEBUG_COLLISION_COLOUR };
-  ship_v[3] = (ALLEGRO_VERTEX) { .x = -6, .y =  4, .z = 0, .color = DEBUG_COLLISION_COLOUR };
+  ship_v[0] = (ALLEGRO_VERTEX) { .x =  8, .y =  0, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
+  ship_v[1] = (ALLEGRO_VERTEX) { .x = -6, .y = -4, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
+  ship_v[2] = (ALLEGRO_VERTEX) { .x = -8, .y =  0, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
+  ship_v[3] = (ALLEGRO_VERTEX) { .x = -6, .y =  4, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
 
   memcpy(ships[0].transformed_v, ship_v, sizeof(ALLEGRO_VERTEX) * ARRAY_SIZE(ship_v));
   for (int i = 0; i < ARRAY_SIZE(ships[0].transformed_v); i++)
