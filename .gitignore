@@ -1,6 +1,9 @@
 # MacOS Files
 *.DS_Store
 
+#Swap Files
+*.swp
+
 # Prerequisites
 *.d
 
