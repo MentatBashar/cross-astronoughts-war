@@ -16,7 +16,7 @@
 #define BUFFER_WIDTH	800
 #define BUFFER_HEIGHT	800
 
-#define DISPLAY_SCALE 	2
+#define DISPLAY_SCALE 	1.5
 #define DISPLAY_WIDTH 	(BUFFER_WIDTH  * DISPLAY_SCALE)
 #define DISPLAY_HEIGHT 	(BUFFER_HEIGHT * DISPLAY_SCALE)
 
@@ -26,7 +26,7 @@
 #define ASTEROID_VERTICES_COUNT 6
 
 #define BULLETS_COUNT	  128
-#define ASTEROIDS_COUNT 20
+#define ASTEROIDS_COUNT 60
 
 
 // DISPLAY
@@ -59,8 +59,8 @@ ALLEGRO_COLOR ASTEROID_COLOUR = { .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
 int DEBUG_VIEW_COLLIDERS = false;
 
 // MISC VARIABLES
-const int BORDER_LENGTH  = 360;
-const int BORDER_PADDING =  12;
+const int BORDER_LENGTH  = 750;
+const int BORDER_PADDING =  25;
 
 
 typedef struct SHIP
@@ -568,15 +568,7 @@ bool game_end_update()
 
 void gui_draw()
 {
-  al_draw_textf(font, 
-      al_map_rgb(255, 255, 255), 
-      BORDER_LENGTH + BORDER_PADDING*2, 20, ALLEGRO_ALIGN_LEFT, 
-      "P1 LIVES: %d", ships[0].lives);
-
-  al_draw_textf(font, 
-      al_map_rgb(255, 255, 255), 
-      BORDER_LENGTH + BORDER_PADDING*2, 40, ALLEGRO_ALIGN_LEFT, 
-      "P2 LIVES: %d", ships[1].lives);
+  ;
 }
 
 void ship_draw()
