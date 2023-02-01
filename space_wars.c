@@ -23,7 +23,7 @@
 #define BUFFER_WIDTH	800
 #define BUFFER_HEIGHT	800
 
-#define DISPLAY_SCALE 	1.5
+#define DISPLAY_SCALE 	1
 #define DISPLAY_WIDTH 	(BUFFER_WIDTH  * DISPLAY_SCALE)
 #define DISPLAY_HEIGHT 	(BUFFER_HEIGHT * DISPLAY_SCALE)
 
@@ -57,6 +57,9 @@ ALLEGRO_VERTEX bullet_v[4];
 ALLEGRO_COLOR ERROR_COLOUR = { .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 
 ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR = { .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0};
+
+ALLEGRO_COLOR U_NAC_BOARD_COLOUR = { .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0};
+ALLEGRO_COLOR NAC_BOARD_COLOUR = { .r = 0.7, .g = 0.7, .b = 0.7, .a = 1.0};
 
 ALLEGRO_COLOR P1_COLOUR = { .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
@@ -308,10 +311,10 @@ void nac_boards_init()
   {
     for (int j = 0; j < 3; j++)
     {
-      nac_boards[i][j].length = 160;
+      nac_boards[i][j].length = 120;
       nac_boards[i][j].winner = 0;
-      nac_boards[i][j].x_0 = u_nac_board.x_0 + (nac_boards[i][j].length * i);
-      nac_boards[i][j].y_0 = u_nac_board.y_0 + (nac_boards[i][j].length * j);
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length+40) * i);
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length+40) * j);
 
       for (int k = 0; k < 3; k++)
       {
@@ -631,56 +634,54 @@ void nac_boards_draw()
                u_nac_board.y_0,
                u_nac_board.x_0 + u_nac_board.length/3,
                u_nac_board.y_0 + u_nac_board.length,
-               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+               U_NAC_BOARD_COLOUR, 1);
 
   al_draw_line(u_nac_board.x_0 + 2*u_nac_board.length/3, 
                u_nac_board.y_0,
                u_nac_board.x_0 + 2*u_nac_board.length/3,
                u_nac_board.y_0 + u_nac_board.length,
-               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+               U_NAC_BOARD_COLOUR, 1);
 
   al_draw_line(u_nac_board.x_0,
                u_nac_board.y_0 + u_nac_board.length/3,
                u_nac_board.x_0 + u_nac_board.length, 
                u_nac_board.y_0 + u_nac_board.length/3,
-               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+               U_NAC_BOARD_COLOUR, 1);
 
   al_draw_line(u_nac_board.x_0,
                u_nac_board.y_0 + 2*u_nac_board.length/3,
                u_nac_board.x_0 + u_nac_board.length,
                u_nac_board.y_0 + 2*u_nac_board.length/3,
-               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+               U_NAC_BOARD_COLOUR, 1);
 
-  // Draw nac_boards
+  // Draw nac_boards KIT BAD
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
     {
-      double padded_length = nac_boards[i][j].length - 40;
-
-      al_draw_line(nac_boards[i][j].x_0 + 20 + padded_length/3,
+      al_draw_line(nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
                    nac_boards[i][j].y_0 + 20,
-                   nac_boards[i][j].x_0 + 20 + padded_length/3,
-                   nac_boards[i][j].y_0 + 20 + padded_length,
-                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+                   NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + 20 + 2*padded_length/3,
+      al_draw_line(nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
                    nac_boards[i][j].y_0 + 20,
-                   nac_boards[i][j].x_0 + 20 + 2*padded_length/3,
-                   nac_boards[i][j].y_0 + 20 + padded_length,
-                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+                   nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+                   NAC_BOARD_COLOUR, 1);
 
       al_draw_line(nac_boards[i][j].x_0 + 20,
-                   nac_boards[i][j].y_0 + 20 + padded_length/3,
-                   nac_boards[i][j].x_0 + 20 + padded_length,
-                   nac_boards[i][j].y_0 + 20 + padded_length/3,
-                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
+                   NAC_BOARD_COLOUR, 1);
 
       al_draw_line(nac_boards[i][j].x_0 + 20,
-                   nac_boards[i][j].y_0 + 20 + 2*padded_length/3,
-                   nac_boards[i][j].x_0 + 20 + padded_length,
-                   nac_boards[i][j].y_0 + 20 + 2*padded_length/3,
-                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
+                   NAC_BOARD_COLOUR, 1);
     }
   }
 }
