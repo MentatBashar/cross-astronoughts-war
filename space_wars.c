@@ -27,12 +27,12 @@
 #define DISPLAY_WIDTH 	(BUFFER_WIDTH  * DISPLAY_SCALE)
 #define DISPLAY_HEIGHT 	(BUFFER_HEIGHT * DISPLAY_SCALE)
 
-#define KEY_SEEN			1
-#define KEY_RELEASED	2
+#define KEY_SEEN      1
+#define KEY_RELEASED  2
 
 #define ASTEROID_VERTICES_COUNT 6
 
-#define BULLETS_COUNT	  128
+#define BULLETS_COUNT   128
 #define ASTEROIDS_COUNT 60
 
 
@@ -104,6 +104,25 @@ typedef struct ASTEROID
 } ASTEROID;
 
 ASTEROID asteroids[ASTEROIDS_COUNT];
+
+typedef struct U_NAC_BOARD
+{
+  double x_0, y_0, length;
+  struct NAC_BOARD *child_nac[3][3];
+  int winner;
+} U_NAC_BOARD;
+
+U_NAC_BOARD u_nac_board;
+
+typedef struct NAC_BOARD
+{
+  double x_0, y_0, length;
+  int squares[3][3];
+  int winner;
+} NAC_BOARD;
+
+NAC_BOARD nac_boards[3][3];
+
 
 // 2D Rotation Helper Function
 ALLEGRO_VERTEX rotate2D();
@@ -275,6 +294,36 @@ void asteroids_init()
 
       asteroids[i].transformed_v[j] = 
         (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0, .color = ASTEROID_COLOUR };
+    }
+  }
+}
+
+void nac_boards_init()
+{
+  u_nac_board.x_0 = 160;
+  u_nac_board.y_0 = 160;
+  u_nac_board.length = 480;
+  u_nac_board.winner = 0;
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      u_nac_board.child_nac[i][j] = &nac_boards[i][j];
+
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + 20 + (140 * i%3);
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + 20 + (140 * j%3);
+      nac_boards[i][j].length = 140;
+      nac_boards[i][j].winner = 0;
+
+      for (int k = 0; k < 3; k++)
+      {
+        for (int l = 0; l < 3; l++)
+        {
+          nac_boards[i][j].squares[k][l] = 0;
+        }
+      }
+
     }
   }
 }
@@ -578,6 +627,12 @@ void gui_draw()
   ;
 }
 
+
+void nac_boards_draw()
+{
+  ;
+}
+
 void ship_draw()
 {
   if (ships[0].lives > 0)
@@ -614,7 +669,7 @@ void asteroids_draw()
 
 void border_draw()
 {
-  double x_0 = BORDER_PADDING			, y_0 = BORDER_PADDING;
+  double x_0 = BORDER_PADDING			            , y_0 = BORDER_PADDING;
   double x_1 = BORDER_LENGTH + BORDER_PADDING	, y_1 = BORDER_LENGTH + BORDER_PADDING;
 
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
@@ -673,6 +728,7 @@ int main(int argc, char *argv[])
   ship_init();
   bullets_init();
   asteroids_init();
+  nac_boards_init();
 
   bool done = false;
   bool redraw = true;
@@ -714,6 +770,8 @@ int main(int argc, char *argv[])
       display_pre_draw();
 
       al_clear_to_color(al_map_rgb(0, 0, 0));
+
+      nac_boards_draw();
 
       ship_draw();
       bullets_draw();
