@@ -108,7 +108,6 @@ ASTEROID asteroids[ASTEROIDS_COUNT];
 typedef struct U_NAC_BOARD
 {
   double x_0, y_0, length;
-  struct NAC_BOARD *child_nac[3][3];
   int winner;
 } U_NAC_BOARD;
 
@@ -309,12 +308,10 @@ void nac_boards_init()
   {
     for (int j = 0; j < 3; j++)
     {
-      u_nac_board.child_nac[i][j] = &nac_boards[i][j];
-
-      nac_boards[i][j].x_0 = u_nac_board.x_0 + 20 + (140 * i%3);
-      nac_boards[i][j].y_0 = u_nac_board.y_0 + 20 + (140 * j%3);
-      nac_boards[i][j].length = 140;
+      nac_boards[i][j].length = 160;
       nac_boards[i][j].winner = 0;
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + (nac_boards[i][j].length * i);
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + (nac_boards[i][j].length * j);
 
       for (int k = 0; k < 3; k++)
       {
@@ -323,7 +320,6 @@ void nac_boards_init()
           nac_boards[i][j].squares[k][l] = 0;
         }
       }
-
     }
   }
 }
@@ -630,7 +626,63 @@ void gui_draw()
 
 void nac_boards_draw()
 {
-  ;
+  // Draw u_nac_board
+  al_draw_line(u_nac_board.x_0 + u_nac_board.length/3,
+               u_nac_board.y_0,
+               u_nac_board.x_0 + u_nac_board.length/3,
+               u_nac_board.y_0 + u_nac_board.length,
+               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+
+  al_draw_line(u_nac_board.x_0 + 2*u_nac_board.length/3, 
+               u_nac_board.y_0,
+               u_nac_board.x_0 + 2*u_nac_board.length/3,
+               u_nac_board.y_0 + u_nac_board.length,
+               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+
+  al_draw_line(u_nac_board.x_0,
+               u_nac_board.y_0 + u_nac_board.length/3,
+               u_nac_board.x_0 + u_nac_board.length, 
+               u_nac_board.y_0 + u_nac_board.length/3,
+               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+
+  al_draw_line(u_nac_board.x_0,
+               u_nac_board.y_0 + 2*u_nac_board.length/3,
+               u_nac_board.x_0 + u_nac_board.length,
+               u_nac_board.y_0 + 2*u_nac_board.length/3,
+               al_map_rgb_f(1.0, 1.0, 1.0), 1);
+
+  // Draw nac_boards
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      double padded_length = nac_boards[i][j].length - 40;
+
+      al_draw_line(nac_boards[i][j].x_0 + 20 + padded_length/3,
+                   nac_boards[i][j].y_0 + 20,
+                   nac_boards[i][j].x_0 + 20 + padded_length/3,
+                   nac_boards[i][j].y_0 + 20 + padded_length,
+                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+
+      al_draw_line(nac_boards[i][j].x_0 + 20 + 2*padded_length/3,
+                   nac_boards[i][j].y_0 + 20,
+                   nac_boards[i][j].x_0 + 20 + 2*padded_length/3,
+                   nac_boards[i][j].y_0 + 20 + padded_length,
+                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+
+      al_draw_line(nac_boards[i][j].x_0 + 20,
+                   nac_boards[i][j].y_0 + 20 + padded_length/3,
+                   nac_boards[i][j].x_0 + 20 + padded_length,
+                   nac_boards[i][j].y_0 + 20 + padded_length/3,
+                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+
+      al_draw_line(nac_boards[i][j].x_0 + 20,
+                   nac_boards[i][j].y_0 + 20 + 2*padded_length/3,
+                   nac_boards[i][j].x_0 + 20 + padded_length,
+                   nac_boards[i][j].y_0 + 20 + 2*padded_length/3,
+                   al_map_rgb_f(1.0, 1.0, 1.0), 1);
+    }
+  }
 }
 
 void ship_draw()
