@@ -23,16 +23,16 @@
 #define BUFFER_WIDTH	800
 #define BUFFER_HEIGHT	800
 
-#define DISPLAY_SCALE 	1.5
+#define DISPLAY_SCALE 	1
 #define DISPLAY_WIDTH 	(BUFFER_WIDTH  * DISPLAY_SCALE)
 #define DISPLAY_HEIGHT 	(BUFFER_HEIGHT * DISPLAY_SCALE)
 
-#define KEY_SEEN			1
-#define KEY_RELEASED	2
+#define KEY_SEEN      1
+#define KEY_RELEASED  2
 
 #define ASTEROID_VERTICES_COUNT 6
 
-#define BULLETS_COUNT	  128
+#define BULLETS_COUNT   128
 #define ASTEROIDS_COUNT 60
 
 
@@ -57,6 +57,9 @@ ALLEGRO_VERTEX bullet_v[4];
 ALLEGRO_COLOR ERROR_COLOUR = { .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 
 ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR = { .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0};
+
+ALLEGRO_COLOR U_NAC_BOARD_COLOUR = { .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0};
+ALLEGRO_COLOR NAC_BOARD_COLOUR = { .r = 0.7, .g = 0.7, .b = 0.7, .a = 1.0};
 
 ALLEGRO_COLOR P1_COLOUR = { .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
@@ -104,6 +107,24 @@ typedef struct ASTEROID
 } ASTEROID;
 
 ASTEROID asteroids[ASTEROIDS_COUNT];
+
+typedef struct U_NAC_BOARD
+{
+  double x_0, y_0, length;
+  int winner;
+} U_NAC_BOARD;
+
+U_NAC_BOARD u_nac_board;
+
+typedef struct NAC_BOARD
+{
+  double x_0, y_0, length;
+  int squares[3][3];
+  int winner;
+} NAC_BOARD;
+
+NAC_BOARD nac_boards[3][3];
+
 
 // 2D Rotation Helper Function
 ALLEGRO_VERTEX rotate2D();
@@ -275,6 +296,33 @@ void asteroids_init()
 
       asteroids[i].transformed_v[j] = 
         (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0, .color = ASTEROID_COLOUR };
+    }
+  }
+}
+
+void nac_boards_init()
+{
+  u_nac_board.x_0 = 160;
+  u_nac_board.y_0 = 160;
+  u_nac_board.length = 480;
+  u_nac_board.winner = 0;
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      nac_boards[i][j].length = 120;
+      nac_boards[i][j].winner = 0;
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length+40) * i);
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length+40) * j);
+
+      for (int k = 0; k < 3; k++)
+      {
+        for (int l = 0; l < 3; l++)
+        {
+          nac_boards[i][j].squares[k][l] = 0;
+        }
+      }
     }
   }
 }
@@ -578,6 +626,66 @@ void gui_draw()
   ;
 }
 
+
+void nac_boards_draw()
+{
+  // Draw u_nac_board
+  al_draw_line(u_nac_board.x_0 + u_nac_board.length/3,
+               u_nac_board.y_0,
+               u_nac_board.x_0 + u_nac_board.length/3,
+               u_nac_board.y_0 + u_nac_board.length,
+               U_NAC_BOARD_COLOUR, 1);
+
+  al_draw_line(u_nac_board.x_0 + 2*u_nac_board.length/3, 
+               u_nac_board.y_0,
+               u_nac_board.x_0 + 2*u_nac_board.length/3,
+               u_nac_board.y_0 + u_nac_board.length,
+               U_NAC_BOARD_COLOUR, 1);
+
+  al_draw_line(u_nac_board.x_0,
+               u_nac_board.y_0 + u_nac_board.length/3,
+               u_nac_board.x_0 + u_nac_board.length, 
+               u_nac_board.y_0 + u_nac_board.length/3,
+               U_NAC_BOARD_COLOUR, 1);
+
+  al_draw_line(u_nac_board.x_0,
+               u_nac_board.y_0 + 2*u_nac_board.length/3,
+               u_nac_board.x_0 + u_nac_board.length,
+               u_nac_board.y_0 + 2*u_nac_board.length/3,
+               U_NAC_BOARD_COLOUR, 1);
+
+  // Draw nac_boards KIT BAD
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      al_draw_line(nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + 20,
+                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+                   NAC_BOARD_COLOUR, 1);
+
+      al_draw_line(nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + 20,
+                   nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+                   NAC_BOARD_COLOUR, 1);
+
+      al_draw_line(nac_boards[i][j].x_0 + 20,
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
+                   NAC_BOARD_COLOUR, 1);
+
+      al_draw_line(nac_boards[i][j].x_0 + 20,
+                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
+                   NAC_BOARD_COLOUR, 1);
+    }
+  }
+}
+
 void ship_draw()
 {
   if (ships[0].lives > 0)
@@ -614,7 +722,7 @@ void asteroids_draw()
 
 void border_draw()
 {
-  double x_0 = BORDER_PADDING			, y_0 = BORDER_PADDING;
+  double x_0 = BORDER_PADDING			            , y_0 = BORDER_PADDING;
   double x_1 = BORDER_LENGTH + BORDER_PADDING	, y_1 = BORDER_LENGTH + BORDER_PADDING;
 
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
@@ -673,6 +781,7 @@ int main(int argc, char *argv[])
   ship_init();
   bullets_init();
   asteroids_init();
+  nac_boards_init();
 
   bool done = false;
   bool redraw = true;
@@ -714,6 +823,8 @@ int main(int argc, char *argv[])
       display_pre_draw();
 
       al_clear_to_color(al_map_rgb(0, 0, 0));
+
+      nac_boards_draw();
 
       ship_draw();
       bullets_draw();
