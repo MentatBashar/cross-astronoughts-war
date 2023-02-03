@@ -69,55 +69,64 @@ const int BORDER_PADDING =  25;
 // STRUCTS
 typedef struct SHIP
 {
-  double x, y, r, dx, dy;
-  double thrust;
-  double rot_speed;
-  double fire_delay;
-  int lives;
+    double x, y, r, dx, dy;
+    double thrust;
+    double rot_speed;
+    double fire_delay;
+    int lives;
+    int id;
 
-  ALLEGRO_COLOR colour;
+    ALLEGRO_COLOR colour;
 
-  ALLEGRO_VERTEX transformed_v[4];
+    ALLEGRO_VERTEX transformed_v[4];
 } SHIP;
 
 
 typedef struct BULLET
 {
-  double x, y, r, dx, dy, max_time, timer;
-  bool used;
+    double x, y, r, dx, dy, max_time, timer;
+    bool used;
 
-  ALLEGRO_VERTEX transformed_v[4];
+    ALLEGRO_VERTEX transformed_v[4];
 } BULLET;
+
+typedef struct CHARGE
+{
+    double x, y, radius, dx, dy, timer;
+    int state;
+} CHARGE;
 
 
 typedef struct ASTEROID
 {
-  double x, y, r, dx, dy, dr;
+    double x, y, r, dx, dy, dr;
 
-  ALLEGRO_VERTEX template_v[ASTEROID_VERTICES_COUNT];
-  ALLEGRO_VERTEX transformed_v[ASTEROID_VERTICES_COUNT];
+    ALLEGRO_VERTEX template_v[ASTEROID_VERTICES_COUNT];
+    ALLEGRO_VERTEX transformed_v[ASTEROID_VERTICES_COUNT];
 } ASTEROID;
 
 
 typedef struct U_NAC_BOARD
 {
-  double x_0, y_0, length;
-  int winner;
-  int padding;
+    double x_0, y_0, length;
+    int winner;
+    int padding;
 } U_NAC_BOARD;
 
 
 typedef struct NAC_BOARD
 {
-  double x_0, y_0, length;
-  int squares[3][3];
-  int winner;
+    double x_0, y_0, length;
+    int squares[3][3];
+    int winner;
 } NAC_BOARD;
 
 // STRUCTS VARIABLES
 SHIP ships[2];
 
 BULLET bullets[BULLETS_COUNT];
+
+CHARGE charge;
 
 ASTEROID asteroids[ASTEROIDS_COUNT];
 
@@ -138,44 +147,50 @@ void rotate2D(ALLEGRO_VERTEX* v, double r);
 int rand_int(int lo, int hi);
 float rand_double(double lo, double hi);
 bool circular_collision(double x_0, double y_0, double x_1, double y_1);
+//bool within_cell_boundaries(double x, double y)
 
-// INIT FUNCTIONS
-void must_init(bool test, const char *description);
-void display_init();
-void display_deinit();
-void display_pre_draw();
-void display_post_draw();
+    // INIT FUNCTIONS
+    void must_init(bool test, const char *description);
+    void display_init();
+    void display_deinit();
+    void display_pre_draw();
+    void display_post_draw();
 
-void audio_init();
-void audio_deinit();
+    void audio_init();
+    void audio_deinit();
 
-void keyboard_init();
+    void keyboard_init();
 
-void gui_init();
-void gui_deinit();
+    void gui_init();
+    void gui_deinit();
 
-void ship_init();
-void bullets_init();
-void asteroids_init();
-void nac_boards_init();
+    void ship_init();
+    void bullets_init();
+    void charge_init();
+    void asteroids_init();
+    void nac_boards_init();
 
-void bullets_add(SHIP* ship);
+    void bullets_add(SHIP* ship);
+    void charge_set(double new_x, double new_y, double new_dx, double new_dy);
 
-bool bullet_collision(double x, double y);
-bool asteroid_collision(double x, double y);
+    bool bullet_collision(double x, double y);
+    bool charge_collision(double x, double y);
+    bool asteroid_collision(double x, double y);
 
-void keyboard_update(ALLEGRO_EVENT* event);
-void gui_update();
-void input_update();
-void ship_update(SHIP* ship);
-void bullets_update();
-void asteroids_update();
+    void keyboard_update(ALLEGRO_EVENT* event);
+    void gui_update();
+    void input_update();
+    void ship_update(SHIP* ship);
+    void bullets_update();
+    void charge_update();
+    void asteroids_update();
 
-bool game_end_update();
+    bool game_end_update();
 
-void gui_draw();
-void nac_boards_draw();
-void ship_draw();
-void bullets_draw();
-void asteroids_draw();
-void border_draw();
+    void gui_draw();
+    void nac_boards_draw();
+    void ship_draw();
+    void bullets_draw();
+    void charge_draw();
+    void asteroids_draw();
+    void border_draw();
