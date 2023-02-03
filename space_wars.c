@@ -8,6 +8,30 @@
 #include "space_wars.h"
 
 
+void flag_reader(int argc, char* argv[])
+{
+  if (argc > 1)
+  {
+    for (int i = 1; i < argc; i++)
+    {
+      int opt = getopt(argc, argv, "d");
+      if (opt == -1)
+      {
+        break;
+      }
+
+      switch (opt)
+      {
+        case 'd':
+          DEBUG_VIEW_COLLIDERS++;
+          break;
+        default:
+          exit(1);
+      }
+    }
+  } 
+}
+
 int rand_int(int lo, int hi)
 {
   return lo + (rand() % (hi - lo));
@@ -185,6 +209,7 @@ void nac_boards_init()
   u_nac_board.y_0 = 160;
   u_nac_board.length = 480;
   u_nac_board.winner = 0;
+  u_nac_board.padding = 20;
 
   for (int i = 0; i < 3; i++)
   {
@@ -192,8 +217,8 @@ void nac_boards_init()
     {
       nac_boards[i][j].length = 120;
       nac_boards[i][j].winner = 0;
-      nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length+40) * i);
-      nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length+40) * j);
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * i);
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * j);
 
       for (int k = 0; k < 3; k++)
       {
@@ -505,7 +530,6 @@ void gui_draw()
   ;
 }
 
-
 void nac_boards_draw()
 {
   // Draw u_nac_board
@@ -533,33 +557,33 @@ void nac_boards_draw()
                u_nac_board.y_0 + 2*u_nac_board.length/3,
                U_NAC_BOARD_COLOUR, 1);
 
-  // Draw nac_boards KIT BAD
+  // Draw nac_boards
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
     {
-      al_draw_line(nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20,
-                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
                    NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20,
-                   nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
                    NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + 20,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
-                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
                    NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + 20,
-                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
-                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
-                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
                    NAC_BOARD_COLOUR, 1);
     }
   }
@@ -625,27 +649,7 @@ int main(int argc, char *argv[])
 
   must_init(al_init_image_addon(), "images");
 
-  // Temporary place for debug inits
-  if (argc > 1)
-  {
-    for (int i = 1; i < argc; i++)
-    {
-      int opt = getopt(argc, argv, "d");
-      if (opt == -1)
-      {
-        break;
-      }
-
-      switch (opt)
-      {
-        case 'd':
-          DEBUG_VIEW_COLLIDERS++;
-          break;
-        default:
-          return 1;
-      }
-    }
-  }
+  flag_reader(argc, argv);
 
   display_init();
   audio_init();

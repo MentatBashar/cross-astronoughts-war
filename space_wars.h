@@ -103,6 +103,7 @@ typedef struct U_NAC_BOARD
 {
   double x_0, y_0, length;
   int winner;
+  int padding;
 } U_NAC_BOARD;
 
 
@@ -128,6 +129,8 @@ NAC_BOARD nac_boards[3][3];
 // FUNCTION PROTOTYPES
 
 // UTILITY FUNCTIONS
+
+void flag_reader(int argc, char* argv[]);
 
 // 2D Rotation Helper Function
 ALLEGRO_VERTEX rotate2D();
