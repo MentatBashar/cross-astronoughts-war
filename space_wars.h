@@ -164,7 +164,7 @@ bool asteroid_collision(double x, double y);
 void keyboard_update(ALLEGRO_EVENT* event);
 void gui_update();
 void input_update();
-void ship_updaet(SHIP* ship);
+void ship_update(SHIP* ship);
 void bullets_update();
 void asteroids_update();
 
