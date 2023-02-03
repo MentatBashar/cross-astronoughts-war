@@ -10,5 +10,5 @@ all: space_wars
 clean:
 	-rm $(BIN)
 
-space_wars: space_wars.c
+space_wars: space_wars.c space_wars.h
 	${CC} ${SOURCE} ${CCFLAGS} ${AL} -o ${BIN}

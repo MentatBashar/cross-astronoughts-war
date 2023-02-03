@@ -5,129 +5,40 @@
 
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-#include <allegro5/allegro_image.h>
-
-#define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
-
-#define BUFFER_WIDTH	800
-#define BUFFER_HEIGHT	800
-
-#define DISPLAY_SCALE 	1
-#define DISPLAY_WIDTH 	(BUFFER_WIDTH  * DISPLAY_SCALE)
-#define DISPLAY_HEIGHT 	(BUFFER_HEIGHT * DISPLAY_SCALE)
-
-#define KEY_SEEN      1
-#define KEY_RELEASED  2
-
-#define ASTEROID_VERTICES_COUNT 6
-
-#define BULLETS_COUNT   128
-#define ASTEROIDS_COUNT 60
+#include "space_wars.h"
 
 
-// DISPLAY
-ALLEGRO_DISPLAY* display;
-ALLEGRO_BITMAP* buffer;
-
-// KEYBOARD
-unsigned char key[ALLEGRO_KEY_MAX];
-
-// SAMPLES
-ALLEGRO_SAMPLE* sample_fire;
-
-// FONTS
-ALLEGRO_FONT* font;
-
-// ENTITY TEMPLATE TRANSFORMS
-ALLEGRO_VERTEX ship_v[4];
-ALLEGRO_VERTEX bullet_v[4];
-
-// COLOUR VARIABLES
-ALLEGRO_COLOR ERROR_COLOUR = { .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
-
-ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR = { .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0};
-
-ALLEGRO_COLOR U_NAC_BOARD_COLOUR = { .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0};
-ALLEGRO_COLOR NAC_BOARD_COLOUR = { .r = 0.7, .g = 0.7, .b = 0.7, .a = 1.0};
-
-ALLEGRO_COLOR P1_COLOUR = { .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
-ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
-ALLEGRO_COLOR ASTEROID_COLOUR = { .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
-
-// DEBUG VARIABLES
-int DEBUG_VIEW_COLLIDERS = false;
-
-// MISC VARIABLES
-const int BORDER_LENGTH  = 750;
-const int BORDER_PADDING =  25;
-
-
-typedef struct SHIP
+void flag_reader(int argc, char* argv[])
 {
-  double x, y, r, dx, dy;
-  double thrust;
-  double rot_speed;
-  double fire_delay;
-  int lives;
+  if (argc > 1)
+  {
+    for (int i = 1; i < argc; i++)
+    {
+      int opt = getopt(argc, argv, "d");
+      if (opt == -1)
+      {
+        break;
+      }
 
-  ALLEGRO_COLOR colour;
+      switch (opt)
+      {
+        case 'd':
+          DEBUG_VIEW_COLLIDERS++;
+          break;
+        default:
+          exit(1);
+      }
+    }
+  } 
+}
 
-  ALLEGRO_VERTEX transformed_v[4];
-} SHIP;
-
-SHIP ships[2];
-
-typedef struct BULLET
+void rotate2D(ALLEGRO_VERTEX* v, double r)
 {
-  double x, y, r, dx, dy, max_time, timer;
-  bool used;
+  double rot_x = v->x*cos(r) - v->y*sin(r);
+  double rot_y = v->x*sin(r) + v->y*cos(r);
 
-  ALLEGRO_VERTEX transformed_v[4];
-} BULLET;
-
-BULLET bullets[BULLETS_COUNT];
-
-typedef struct ASTEROID
-{
-  double x, y, r, dx, dy, dr;
-
-  ALLEGRO_VERTEX template_v[ASTEROID_VERTICES_COUNT];
-  ALLEGRO_VERTEX transformed_v[ASTEROID_VERTICES_COUNT];
-} ASTEROID;
-
-ASTEROID asteroids[ASTEROIDS_COUNT];
-
-typedef struct U_NAC_BOARD
-{
-  double x_0, y_0, length;
-  int winner;
-} U_NAC_BOARD;
-
-U_NAC_BOARD u_nac_board;
-
-typedef struct NAC_BOARD
-{
-  double x_0, y_0, length;
-  int squares[3][3];
-  int winner;
-} NAC_BOARD;
-
-NAC_BOARD nac_boards[3][3];
-
-
-// 2D Rotation Helper Function
-ALLEGRO_VERTEX rotate2D();
+  v->x = rot_x ; v->y = rot_y;
+}
 
 int rand_int(int lo, int hi)
 {
@@ -286,13 +197,13 @@ void asteroids_init()
     {
       double start_x = 0.0 ; double start_y = rand_double(3.0, 12.0);
 
-      double rot_x = start_x*cos(j * (ALLEGRO_PI/3)) - start_y*sin(j * (ALLEGRO_PI/3));
-      double rot_y = start_x*sin(j * (ALLEGRO_PI/3)) + start_y*cos(j * (ALLEGRO_PI/3));
-
       asteroids[i].template_v[j] = 
-        (ALLEGRO_VERTEX) { .x = rot_x, .y = rot_y, .z = 0, .color = ERROR_COLOUR };
+        (ALLEGRO_VERTEX) { .x = start_x, .y = start_y, .z = 0, .color = ERROR_COLOUR };
 
-      double final_x = rot_x + asteroids[i].x ; double final_y = rot_y + asteroids[i].y;
+      rotate2D(&asteroids[i].template_v[j], (j * (ALLEGRO_PI/3)));
+
+      double final_x = asteroids[i].template_v[j].x + asteroids[i].x;
+      double final_y = asteroids[i].template_v[j].y + asteroids[i].y;
 
       asteroids[i].transformed_v[j] = 
         (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0, .color = ASTEROID_COLOUR };
@@ -306,6 +217,7 @@ void nac_boards_init()
   u_nac_board.y_0 = 160;
   u_nac_board.length = 480;
   u_nac_board.winner = 0;
+  u_nac_board.padding = 20;
 
   for (int i = 0; i < 3; i++)
   {
@@ -313,8 +225,8 @@ void nac_boards_init()
     {
       nac_boards[i][j].length = 120;
       nac_boards[i][j].winner = 0;
-      nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length+40) * i);
-      nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length+40) * j);
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * i);
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * j);
 
       for (int k = 0; k < 3; k++)
       {
@@ -499,12 +411,11 @@ void ship_update(SHIP* ship)
 
   for (int i = 0; i < ARRAY_SIZE(ship_v); i++)
   {
-    ship->transformed_v[i].x = ship_v[i].x*cos(ship->r) - ship_v[i].y*sin(ship->r);
-    ship->transformed_v[i].y = ship_v[i].x*sin(ship->r) + ship_v[i].y*cos(ship->r);
-  }
+    ship->transformed_v[i].x = ship_v[i].x;
+    ship->transformed_v[i].y = ship_v[i].y;
 
-  for (int i = 0; i < ARRAY_SIZE(ship_v); i++)
-  {
+    rotate2D(&ship->transformed_v[i], ship->r);
+
     ship->transformed_v[i].x += ship->x ; ship->transformed_v[i].y += ship->y;
   }
 }
@@ -548,12 +459,11 @@ void bullets_update()
 
     for (int j = 0; j < ARRAY_SIZE(bullet_v); j++)
     {
-      bullets[i].transformed_v[j].x = bullet_v[j].x*cos(bullets[i].r) - bullet_v[j].y*sin(bullets[i].r);
-      bullets[i].transformed_v[j].y = bullet_v[j].x*sin(bullets[i].r) + bullet_v[j].y*cos(bullets[i].r);
-    }
+      bullets[i].transformed_v[j].x = bullet_v[j].x;
+      bullets[i].transformed_v[j].y = bullet_v[j].y;
 
-    for (int j = 0; j < ARRAY_SIZE(bullet_v); j++)
-    {
+      rotate2D(&bullets[i].transformed_v[j], bullets[i].r);
+
       bullets[i].transformed_v[j].x += bullets[i].x ; bullets[i].transformed_v[j].y += bullets[i].y;
     }
   }
@@ -584,14 +494,11 @@ void asteroids_update()
 
     for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
     {
-      asteroids[i].transformed_v[j].x = asteroids[i].template_v[j].x*cos(asteroids[i].r) - 
-        asteroids[i].template_v[j].y*sin(asteroids[i].r);
-      asteroids[i].transformed_v[j].y = asteroids[i].template_v[j].x*sin(asteroids[i].r) + 
-        asteroids[i].template_v[j].y*cos(asteroids[i].r);
-    }
+      asteroids[i].transformed_v[j].x = asteroids[i].template_v[j].x;
+      asteroids[i].transformed_v[j].y = asteroids[i].template_v[j].y;
 
-    for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
-    {
+      rotate2D(&asteroids[i].transformed_v[j], asteroids[i].r);
+
       asteroids[i].transformed_v[j].x += asteroids[i].x ; asteroids[i].transformed_v[j].y += asteroids[i].y;
     }
   }
@@ -626,7 +533,6 @@ void gui_draw()
   ;
 }
 
-
 void nac_boards_draw()
 {
   // Draw u_nac_board
@@ -654,33 +560,33 @@ void nac_boards_draw()
                u_nac_board.y_0 + 2*u_nac_board.length/3,
                U_NAC_BOARD_COLOUR, 1);
 
-  // Draw nac_boards KIT BAD
+  // Draw nac_boards
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
     {
-      al_draw_line(nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20,
-                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
                    NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20,
-                   nac_boards[i][j].x_0 + 20 + 2*nac_boards[i][j].length/3,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
                    NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + 20,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
-                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
-                   nac_boards[i][j].y_0 + 20 + nac_boards[i][j].length/3,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
                    NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + 20,
-                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
-                   nac_boards[i][j].x_0 + 20 + nac_boards[i][j].length,
-                   nac_boards[i][j].y_0 + 20 + 2*nac_boards[i][j].length/3,
+      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
+                   nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
+                   nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
                    NAC_BOARD_COLOUR, 1);
     }
   }
@@ -746,27 +652,7 @@ int main(int argc, char *argv[])
 
   must_init(al_init_image_addon(), "images");
 
-  // Temporary place for debug inits
-  if (argc > 1)
-  {
-    for (int i = 1; i < argc; i++)
-    {
-      int opt = getopt(argc, argv, "d");
-      if (opt == -1)
-      {
-        break;
-      }
-
-      switch (opt)
-      {
-        case 'd':
-          DEBUG_VIEW_COLLIDERS++;
-          break;
-        default:
-          return 1;
-      }
-    }
-  }
+  flag_reader(argc, argv);
 
   display_init();
   audio_init();
