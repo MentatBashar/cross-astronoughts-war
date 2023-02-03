@@ -133,7 +133,7 @@ NAC_BOARD nac_boards[3][3];
 void flag_reader(int argc, char* argv[]);
 
 // 2D Rotation Helper Function
-ALLEGRO_VERTEX rotate2D();
+void rotate2D(ALLEGRO_VERTEX* v, double r);
 
 int rand_int(int lo, int hi);
 float rand_double(double lo, double hi);

@@ -32,6 +32,14 @@ void flag_reader(int argc, char* argv[])
   } 
 }
 
+void rotate2D(ALLEGRO_VERTEX* v, double r)
+{
+  double rot_x = v->x*cos(r) - v->y*sin(r);
+  double rot_y = v->x*sin(r) + v->y*cos(r);
+
+  v->x = rot_x ; v->y = rot_y;
+}
+
 int rand_int(int lo, int hi)
 {
   return lo + (rand() % (hi - lo));
@@ -189,13 +197,13 @@ void asteroids_init()
     {
       double start_x = 0.0 ; double start_y = rand_double(3.0, 12.0);
 
-      double rot_x = start_x*cos(j * (ALLEGRO_PI/3)) - start_y*sin(j * (ALLEGRO_PI/3));
-      double rot_y = start_x*sin(j * (ALLEGRO_PI/3)) + start_y*cos(j * (ALLEGRO_PI/3));
-
       asteroids[i].template_v[j] = 
-        (ALLEGRO_VERTEX) { .x = rot_x, .y = rot_y, .z = 0, .color = ERROR_COLOUR };
+        (ALLEGRO_VERTEX) { .x = start_x, .y = start_y, .z = 0, .color = ERROR_COLOUR };
 
-      double final_x = rot_x + asteroids[i].x ; double final_y = rot_y + asteroids[i].y;
+      rotate2D(&asteroids[i].template_v[j], (j * (ALLEGRO_PI/3)));
+
+      double final_x = asteroids[i].template_v[j].x + asteroids[i].x;
+      double final_y = asteroids[i].template_v[j].y + asteroids[i].y;
 
       asteroids[i].transformed_v[j] = 
         (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0, .color = ASTEROID_COLOUR };
@@ -403,12 +411,11 @@ void ship_update(SHIP* ship)
 
   for (int i = 0; i < ARRAY_SIZE(ship_v); i++)
   {
-    ship->transformed_v[i].x = ship_v[i].x*cos(ship->r) - ship_v[i].y*sin(ship->r);
-    ship->transformed_v[i].y = ship_v[i].x*sin(ship->r) + ship_v[i].y*cos(ship->r);
-  }
+    ship->transformed_v[i].x = ship_v[i].x;
+    ship->transformed_v[i].y = ship_v[i].y;
 
-  for (int i = 0; i < ARRAY_SIZE(ship_v); i++)
-  {
+    rotate2D(&ship->transformed_v[i], ship->r);
+
     ship->transformed_v[i].x += ship->x ; ship->transformed_v[i].y += ship->y;
   }
 }
@@ -452,12 +459,11 @@ void bullets_update()
 
     for (int j = 0; j < ARRAY_SIZE(bullet_v); j++)
     {
-      bullets[i].transformed_v[j].x = bullet_v[j].x*cos(bullets[i].r) - bullet_v[j].y*sin(bullets[i].r);
-      bullets[i].transformed_v[j].y = bullet_v[j].x*sin(bullets[i].r) + bullet_v[j].y*cos(bullets[i].r);
-    }
+      bullets[i].transformed_v[j].x = bullet_v[j].x;
+      bullets[i].transformed_v[j].y = bullet_v[j].y;
 
-    for (int j = 0; j < ARRAY_SIZE(bullet_v); j++)
-    {
+      rotate2D(&bullets[i].transformed_v[j], bullets[i].r);
+
       bullets[i].transformed_v[j].x += bullets[i].x ; bullets[i].transformed_v[j].y += bullets[i].y;
     }
   }
@@ -488,14 +494,11 @@ void asteroids_update()
 
     for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
     {
-      asteroids[i].transformed_v[j].x = asteroids[i].template_v[j].x*cos(asteroids[i].r) - 
-        asteroids[i].template_v[j].y*sin(asteroids[i].r);
-      asteroids[i].transformed_v[j].y = asteroids[i].template_v[j].x*sin(asteroids[i].r) + 
-        asteroids[i].template_v[j].y*cos(asteroids[i].r);
-    }
+      asteroids[i].transformed_v[j].x = asteroids[i].template_v[j].x;
+      asteroids[i].transformed_v[j].y = asteroids[i].template_v[j].y;
 
-    for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
-    {
+      rotate2D(&asteroids[i].transformed_v[j], asteroids[i].r);
+
       asteroids[i].transformed_v[j].x += asteroids[i].x ; asteroids[i].transformed_v[j].y += asteroids[i].y;
     }
   }
