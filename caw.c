@@ -1,11 +1,18 @@
 /*
- _______  _____  _______ _______ _______      _  _  _ _______  ______ _______
- |______ |_____] |_____| |       |______      |  |  | |_____| |_____/ |______
- ______| |       |     | |_____  |______      |__|__| |     | |    \_ ______|
+
+                           _______  ______  _____  _______ _______
+                           |       |_____/ |     | |______ |______
+                           |_____  |    \_ |_____| ______| ______|
+ _______ _______ _______  ______  _____  __   _  _____  _     _  ______ _     _ _______ _______
+ |_____| |______    |    |_____/ |     | | \  | |     | |     | |  ____ |_____|    |    |______
+ |     | ______|    |    |    \_ |_____| |  \_| |_____| |_____| |_____| |     |    |    ______|
+                                   _  _  _ _______  ______
+                                   |  |  | |_____| |_____/
+                                   |__|__| |     | |    \_
 
 */
 
-#include "space_wars.h"
+#include "caw.h"
 
 
 void flag_reader(int argc, char* argv[])
@@ -69,7 +76,7 @@ void must_init(bool test, const char *description)
 
 void display_init()
 {
-  al_set_new_window_title("Space Wars II");
+  al_set_new_window_title("Cross Astronoughts War");
   display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
   must_init(display, "display");
 
