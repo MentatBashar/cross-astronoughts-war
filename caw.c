@@ -199,6 +199,8 @@ void charge_init()
 {
   charge.x = rand_int(BORDER_PADDING, BORDER_PADDING + BORDER_LENGTH);
   charge.y = rand_int(BORDER_PADDING, BORDER_PADDING + BORDER_LENGTH);
+  charge.dx = 0.0;
+  charge.dy = 0.0;
   charge.radius = 5.0;
   charge.state = 0;
   charge.timer = 0.0;
@@ -546,15 +548,20 @@ void charge_update()
   charge.x += charge.dx;
   charge.y += charge.dy;
 
-  if (charge.dx < 0)
+  if (charge.dx < 0.0)
     charge.dx += 0.05;
   else
     charge.dx -= 0.05;
 
-  if (charge.dy < 0)
+  if (charge.dy < 0.0)
     charge.dy += 0.05;
   else
     charge.dy -= 0.05;
+
+  if (charge.dx <= 0.05 && charge.dx >= -0.05)
+    charge.dx = 0;
+  if (charge.dy <= 0.05 && charge.dy >= -0.05)
+    charge.dy = 0;
 
   if (charge.x <= BORDER_PADDING)
     charge.x =  BORDER_LENGTH + BORDER_PADDING - 1;
