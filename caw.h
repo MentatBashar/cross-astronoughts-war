@@ -119,6 +119,7 @@ typedef struct NAC_BOARD
     double x_0, y_0, length;
     int squares[3][3];
     int winner;
+    double padding;
 } NAC_BOARD;
 
 // STRUCTS VARIABLES
@@ -189,6 +190,9 @@ bool game_end_update();
 
 void gui_draw();
 void nac_boards_draw();
+void nac_board_mark(int i, int j);
+void x_draw(double x_0, double y_0, int i, int j);
+void o_draw(double x_0, double y_0, int i, int j);
 void ship_draw();
 void bullets_draw();
 void charge_draw();

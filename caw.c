@@ -253,7 +253,7 @@ void nac_boards_init()
       nac_boards[i][j].winner = 0;
       nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * i);
       nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * j);
-
+      nac_boards[i][j].padding = 10;
       for (int k = 0; k < 3; k++)
       {
         for (int l = 0; l < 3; l++)
@@ -693,8 +693,37 @@ void nac_boards_draw()
           nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
           nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
           NAC_BOARD_COLOUR, 1);
+
+      nac_board_mark(i, j);
     }
   }
+}
+
+void nac_board_mark(int i, int j)
+{
+    x_draw(nac_boards[i][j].x_0 + nac_boards[i][j].padding + u_nac_board.padding,
+        nac_boards[i][j].y_0 + nac_boards[i][j].padding + u_nac_board.padding, i, j);
+
+    o_draw(nac_boards[i][j].x_0 + nac_boards[i][j].padding + u_nac_board.padding,
+        nac_boards[i][j].y_0 + nac_boards[i][j].padding + u_nac_board.padding, i, j);
+}
+
+void x_draw(double x_0, double y_0, int i, int j)
+{
+  int x_1 = x_0 + (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
+  int y_1 = y_0 + (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
+  x_0 += (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
+  x_1 -= (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
+}
+
+void o_draw(double x_0, double y_0, int i, int j)
+{
+  double r = ((nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2)/ 2;
+  x_0 += r;
+  y_0 += r;
+  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 1);
 }
 
 void ship_draw()
