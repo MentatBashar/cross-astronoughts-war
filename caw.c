@@ -558,11 +558,6 @@ void charge_update()
   else
     charge.dy -= 0.05;
 
-  /*if (charge.dx <= 0.05 && charge.dx >= -0.05)
-    charge.dx = 0;
-  if (charge.dy <= 0.05 && charge.dy >= -0.05)
-    charge.dy = 0;*/
-
   if (charge.x <= BORDER_PADDING)
     charge.x =  BORDER_LENGTH + BORDER_PADDING - 1;
   if (charge.x >= BORDER_LENGTH + BORDER_PADDING)
