@@ -26,7 +26,7 @@
 #define ASTEROID_VERTICES_COUNT 6
 
 #define BULLETS_COUNT   128
-#define ASTEROIDS_COUNT 60
+#define ASTEROIDS_COUNT 40
 
 
 // DISPLAY
@@ -149,48 +149,48 @@ float rand_double(double lo, double hi);
 bool circular_collision(double x_0, double y_0, double x_1, double y_1);
 //bool within_cell_boundaries(double x, double y)
 
-    // INIT FUNCTIONS
-    void must_init(bool test, const char *description);
-    void display_init();
-    void display_deinit();
-    void display_pre_draw();
-    void display_post_draw();
+// INIT FUNCTIONS
+void must_init(bool test, const char *description);
+void display_init();
+void display_deinit();
+void display_pre_draw();
+void display_post_draw();
 
-    void audio_init();
-    void audio_deinit();
+void audio_init();
+void audio_deinit();
 
-    void keyboard_init();
+void keyboard_init();
 
-    void gui_init();
-    void gui_deinit();
+void gui_init();
+void gui_deinit();
 
-    void ship_init();
-    void bullets_init();
-    void charge_init();
-    void asteroids_init();
-    void nac_boards_init();
+void ship_init();
+void bullets_init();
+void charge_init();
+void asteroids_init();
+void nac_boards_init();
 
-    void bullets_add(SHIP* ship);
-    void charge_set(double new_x, double new_y, double new_dx, double new_dy);
+void bullets_add(SHIP* ship);
+void charge_set(SHIP* ship);
 
-    bool bullet_collision(double x, double y);
-    bool charge_collision(double x, double y);
-    bool asteroid_collision(double x, double y);
+bool bullet_collision(double x, double y);
+bool charge_collision(double x, double y);
+bool asteroid_collision(double x, double y);
 
-    void keyboard_update(ALLEGRO_EVENT* event);
-    void gui_update();
-    void input_update();
-    void ship_update(SHIP* ship);
-    void bullets_update();
-    void charge_update();
-    void asteroids_update();
+void keyboard_update(ALLEGRO_EVENT* event);
+void gui_update();
+void input_update();
+void ship_update(SHIP* ship);
+void bullets_update();
+void charge_update();
+void asteroids_update();
 
-    bool game_end_update();
+bool game_end_update();
 
-    void gui_draw();
-    void nac_boards_draw();
-    void ship_draw();
-    void bullets_draw();
-    void charge_draw();
-    void asteroids_draw();
-    void border_draw();
+void gui_draw();
+void nac_boards_draw();
+void ship_draw();
+void bullets_draw();
+void charge_draw();
+void asteroids_draw();
+void border_draw();

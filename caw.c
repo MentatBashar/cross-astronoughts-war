@@ -297,14 +297,16 @@ void bullets_add(SHIP* ship)
       );
 }
 
-void charge_set(double new_x, double new_y, double new_dx, double new_dy)
+void charge_set(SHIP* ship)
 {
-  charge.x = new_x;
-  charge.y = new_y;
+  charge.x = ship->x;
+  charge.y = ship->y;
   charge.state = 0;
   charge.timer = 0.0;
-  charge.dx = new_dx;
-  charge.dy = new_dy;
+  charge.dx = ship->dx + 5.0*cos(ship->r);
+  charge.dy = ship->dy + 5.0*sin(ship->r);
+
+  printf("%f, %f\n", charge.dx, charge.dy);
 }
 
 bool bullet_collision(double x, double y)
@@ -325,7 +327,7 @@ bool bullet_collision(double x, double y)
 
 bool charge_collision(double x, double y)
 {
-  if (charge.state == 0)
+  if (charge.state == 0 && charge.timer > 3.0)
   {
     if(circular_collision(charge.x, charge.y, x, y)) //Within boundaries
     {
@@ -416,18 +418,19 @@ void input_update()
       ships[1].fire_delay = 3.0;
     }
   }
+
   if (key[ALLEGRO_KEY_Z])
   {
     if (charge.state == 1)
     {
-      charge_set(ships[0].x, ships[0].y, ships[0].dx, ships[0].dy);
+      charge_set(&ships[0]);
     }
   }
   if (key[ALLEGRO_KEY_M])
   {
     if (charge.state == 2)
     {
-      charge_set(ships[1].x, ships[1].y, ships[1].dx, ships[1].dy);
+      charge_set(&ships[1]);
     }
   }
 }
@@ -454,7 +457,7 @@ void ship_update(SHIP* ship)
       charge_init();
     }
   }
-  if (charge_collision(ship->x, ship->y) && charge.timer > 3.0)
+  if (charge_collision(ship->x, ship->y))
   {
     charge.state = ship->id;
   }
@@ -544,16 +547,21 @@ void charge_update()
   charge.timer += 0.1;
   charge.x += charge.dx;
   charge.y += charge.dy;
-  charge.dx -= 0.05;
-  charge.dy -= 0.05;
+
   if (charge.dx < 0)
-  {
-    charge.dx = 0;
-  }
+    charge.dx += 0.05;
+  else
+    charge.dx -= 0.05;
+
   if (charge.dy < 0)
-  {
-    charge.dy = 0;
-  }
+    charge.dy += 0.05;
+  else
+    charge.dy -= 0.05;
+
+  /*if (charge.dx <= 0.05 && charge.dx >= -0.05)
+    charge.dx = 0;
+  if (charge.dy <= 0.05 && charge.dy >= -0.05)
+    charge.dy = 0;*/
 
   if (charge.x <= BORDER_PADDING)
     charge.x =  BORDER_LENGTH + BORDER_PADDING - 1;
