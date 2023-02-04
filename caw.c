@@ -305,8 +305,6 @@ void charge_set(SHIP* ship)
   charge.timer = 0.0;
   charge.dx = ship->dx + 5.0*cos(ship->r);
   charge.dy = ship->dy + 5.0*sin(ship->r);
-
-  printf("%f, %f\n", charge.dx, charge.dy);
 }
 
 bool bullet_collision(double x, double y)
