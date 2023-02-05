@@ -93,7 +93,7 @@ typedef struct BULLET
 typedef struct CHARGE
 {
     double x, y, radius, dx, dy, timer;
-    int state;
+    int state, last_touch;
 } CHARGE;
 
 
@@ -113,11 +113,16 @@ typedef struct U_NAC_BOARD
     int padding;
 } U_NAC_BOARD;
 
+typedef struct CELL
+{
+    double x_0, y_0, length;
+    int state;
+} CELL;
 
 typedef struct NAC_BOARD
 {
     double x_0, y_0, length;
-    int squares[3][3];
+    CELL cells[3][3];
     int winner;
     double padding;
 } NAC_BOARD;
@@ -135,6 +140,8 @@ U_NAC_BOARD u_nac_board;
 
 NAC_BOARD nac_boards[3][3];
 
+CELL cells[3][3];
+
 
 // FUNCTION PROTOTYPES
 
@@ -148,7 +155,6 @@ void rotate2D(ALLEGRO_VERTEX* v, double r);
 int rand_int(int lo, int hi);
 float rand_double(double lo, double hi);
 bool circular_collision(double x_0, double y_0, double x_1, double y_1);
-//bool within_cell_boundaries(double x, double y)
 
 // INIT FUNCTIONS
 void must_init(bool test, const char *description);
@@ -170,6 +176,7 @@ void bullets_init();
 void charge_init();
 void asteroids_init();
 void nac_boards_init();
+void cells_init();
 
 void bullets_add(SHIP* ship);
 void charge_set(SHIP* ship);
@@ -177,9 +184,10 @@ void charge_set(SHIP* ship);
 bool bullet_collision(double x, double y);
 bool charge_collision(double x, double y);
 bool asteroid_collision(double x, double y);
+bool within_nac_board(double x, double y, int t);
+bool within_cell(double x, double y, int i, int j, int t);
 
 void keyboard_update(ALLEGRO_EVENT* event);
-void gui_update();
 void input_update();
 void ship_update(SHIP* ship);
 void bullets_update();
@@ -188,11 +196,11 @@ void asteroids_update();
 
 bool game_end_update();
 
-void gui_draw();
 void nac_boards_draw();
-void nac_board_mark(int i, int j);
-void x_draw(double x_0, double y_0, int i, int j);
-void o_draw(double x_0, double y_0, int i, int j);
+void nac_boards_debug();
+void nac_boards_mark();
+void x_draw(double x_0, double y_0);
+void o_draw(double x_0, double y_0);
 void ship_draw();
 void bullets_draw();
 void charge_draw();

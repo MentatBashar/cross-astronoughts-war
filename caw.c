@@ -66,11 +66,6 @@ bool circular_collision(double x_0, double y_0, double x_1, double y_1)
   return false;
 }
 
-//bool within_cell_boundaries(double x, double y)
-//{
-//
-//}
-
 void must_init(bool test, const char *description)
 {
   if(test) return;
@@ -201,7 +196,7 @@ void charge_init()
   charge.y = rand_int(BORDER_PADDING, BORDER_PADDING + BORDER_LENGTH);
   charge.dx = 0.0;
   charge.dy = 0.0;
-  charge.radius = 5.0;
+  charge.radius = 2.0;
   charge.state = 0;
   charge.timer = 0.0;
 }
@@ -251,14 +246,17 @@ void nac_boards_init()
     {
       nac_boards[i][j].length = 120;
       nac_boards[i][j].winner = 0;
-      nac_boards[i][j].x_0 = u_nac_board.x_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * i);
-      nac_boards[i][j].y_0 = u_nac_board.y_0 + ((nac_boards[i][j].length + 2*u_nac_board.padding) * j);
-      nac_boards[i][j].padding = 10;
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + (nac_boards[i][j].length + 2*u_nac_board.padding) * i;
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + (nac_boards[i][j].length + 2*u_nac_board.padding) * j;
+      nac_boards[i][j].padding = 20;
       for (int k = 0; k < 3; k++)
       {
         for (int l = 0; l < 3; l++)
         {
-          nac_boards[i][j].squares[k][l] = 0;
+          nac_boards[i][j].cells[k][l].state = 0;
+          nac_boards[i][j].cells[k][l].length = nac_boards[i][j].length / 3;
+          nac_boards[i][j].cells[k][l].x_0 = nac_boards[i][j].x_0 + nac_boards[i][j].padding + nac_boards[i][j].cells[k][l].length * k;
+          nac_boards[i][j].cells[k][l].y_0 = nac_boards[i][j].y_0 + nac_boards[i][j].padding + nac_boards[i][j].cells[k][l].length * l;
         }
       }
     }
@@ -304,6 +302,7 @@ void charge_set(SHIP* ship)
   charge.x = ship->x;
   charge.y = ship->y;
   charge.state = 0;
+  charge.last_touch = ship->id;
   charge.timer = 0.0;
   charge.dx = ship->dx + 5.0*cos(ship->r);
   charge.dy = ship->dy + 5.0*sin(ship->r);
@@ -343,12 +342,53 @@ bool asteroid_collision(double x, double y)
   for (int i = 0; i < ASTEROIDS_COUNT; i++)
   {
     if (circular_collision(asteroids[i].x, asteroids[i].y, x, y))
-      return true;
+      return false;
   }
 
   return false;
 }
 
+bool within_nac_board(double x, double y, int t)
+{
+    for (int i = 2; i >= 0; i--)
+    {
+        for (int j = 2; j >= 0; j--)
+        {
+            if (x > nac_boards[i][j].x_0 &&
+                x < nac_boards[i][j].x_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
+                y > nac_boards[i][j].y_0 &&
+                y < nac_boards[i][j].y_0 + nac_boards[i][j].length + u_nac_board.padding*2)
+            {
+                if (nac_boards[i][j].winner == 0)
+
+                    return within_cell(x, y, i, j, t);
+            }
+        }
+    }
+    return false;
+}
+
+bool within_cell(double x, double y, int i, int j, int t)
+{
+    for (int k = 2; k >= 0; k--)
+    {
+        for (int l = 2; l >= 0; l--)
+        {
+            if (x > nac_boards[i][j].cells[k][l].x_0 &&
+                x < nac_boards[i][j].cells[k][l].x_0 + nac_boards[i][j].cells[k][l].length &&
+                y > nac_boards[i][j].cells[k][l].y_0 &&
+                y < nac_boards[i][j].cells[k][l].y_0 + nac_boards[i][j].cells[k][l].length)
+            {
+                if (nac_boards[i][j].cells[k][l].state == 0)
+                {
+                    nac_boards[i][j].cells[k][l].state = t;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 void keyboard_update(ALLEGRO_EVENT* event)
 {
@@ -366,11 +406,6 @@ void keyboard_update(ALLEGRO_EVENT* event)
       key[event->keyboard.keycode] &= KEY_RELEASED;
       break;
   }
-}
-
-void gui_update()
-{
-  ;
 }
 
 void input_update()
@@ -560,8 +595,18 @@ void charge_update()
 
   if (charge.dx <= 0.05 && charge.dx >= -0.05)
     charge.dx = 0;
+
   if (charge.dy <= 0.05 && charge.dy >= -0.05)
     charge.dy = 0;
+
+  if (charge.dx == 0 && charge.dy == 0 && charge.last_touch != 0)
+  {
+    if(within_nac_board(charge.x, charge.y, charge.last_touch))
+    {
+        charge_init();
+    }
+    charge.last_touch = 0;
+  }
 
   if (charge.x <= BORDER_PADDING)
     charge.x =  BORDER_LENGTH + BORDER_PADDING - 1;
@@ -632,12 +677,6 @@ bool game_end_update()
   return false;
 }
 
-
-void gui_draw()
-{
-  ;
-}
-
 void nac_boards_draw()
 {
   // Draw u_nac_board
@@ -693,37 +732,54 @@ void nac_boards_draw()
           nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
           nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
           NAC_BOARD_COLOUR, 1);
-
-      nac_board_mark(i, j);
     }
   }
 }
 
-void nac_board_mark(int i, int j)
+void x_draw(double x_0, double y_0)
 {
-    x_draw(nac_boards[i][j].x_0 + nac_boards[i][j].padding + u_nac_board.padding,
-        nac_boards[i][j].y_0 + nac_boards[i][j].padding + u_nac_board.padding, i, j);
-
-    o_draw(nac_boards[i][j].x_0 + nac_boards[i][j].padding + u_nac_board.padding,
-        nac_boards[i][j].y_0 + nac_boards[i][j].padding + u_nac_board.padding, i, j);
-}
-
-void x_draw(double x_0, double y_0, int i, int j)
-{
-  int x_1 = x_0 + (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
-  int y_1 = y_0 + (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
+  x_0 += 10;
+  y_0 += 10;
+  double x_1 = x_0 + 20;
+  double y_1 = y_0 + 20;
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
-  x_0 += (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
-  x_1 -= (nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2;
+  x_0 += 20;
+  x_1 -= 20;
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
 }
 
-void o_draw(double x_0, double y_0, int i, int j)
+void o_draw(double x_0, double y_0)
 {
-  double r = ((nac_boards[i][j].length / 3) - nac_boards[i][j].padding*2)/ 2;
+  x_0 += 10;
+  y_0 += 10;
+  double r = 10;
   x_0 += r;
   y_0 += r;
   al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 1);
+}
+
+void nac_boards_mark()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            for (int k = 0; k < 3; k++)
+            {
+                for (int l = 0; l < 3; l++)
+                {
+                    if (nac_boards[i][j].cells[k][l].state == 1)
+                    {
+                        o_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
+                    }
+                    else if (nac_boards[i][j].cells[k][l].state == 2)
+                    {
+                        x_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ship_draw()
@@ -830,7 +886,6 @@ int main(int argc, char *argv[])
         bullets_update();
         charge_update();
         asteroids_update();
-        gui_update();
 
         if (key[ALLEGRO_KEY_ESCAPE])
           done = true;
@@ -855,6 +910,7 @@ int main(int argc, char *argv[])
       al_clear_to_color(al_map_rgb(0, 0, 0));
 
       nac_boards_draw();
+      nac_boards_mark();
 
       ship_draw();
       bullets_draw();
@@ -862,8 +918,6 @@ int main(int argc, char *argv[])
       asteroids_draw();
 
       border_draw();
-
-      gui_draw();
 
       done = game_end_update();
 
