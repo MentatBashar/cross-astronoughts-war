@@ -59,7 +59,8 @@ ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
 ALLEGRO_COLOR ASTEROID_COLOUR = { .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
 
 // DEBUG VARIABLES
-int DEBUG_VIEW_COLLIDERS = false;
+int DEBUG_VIEW_COLLIDERS = 0;
+int DEBUG_NO_ASTEROID_COLLISION = 1; 
 
 // MISC VARIABLES
 const int BORDER_LENGTH  = 750;

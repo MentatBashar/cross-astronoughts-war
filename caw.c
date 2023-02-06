@@ -31,6 +31,7 @@ void flag_reader(int argc, char* argv[])
       {
         case 'd':
           DEBUG_VIEW_COLLIDERS++;
+          DEBUG_NO_ASTEROID_COLLISION--;
           break;
         default:
           exit(1);
@@ -341,8 +342,9 @@ bool asteroid_collision(double x, double y)
 {
   for (int i = 0; i < ASTEROIDS_COUNT; i++)
   {
-    if (circular_collision(asteroids[i].x, asteroids[i].y, x, y))
-      return false;
+    if (circular_collision(asteroids[i].x, asteroids[i].y, x, y)
+        && DEBUG_NO_ASTEROID_COLLISION)
+      return true;
   }
 
   return false;
