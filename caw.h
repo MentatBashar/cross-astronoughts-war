@@ -70,62 +70,62 @@ const int BORDER_PADDING =  25;
 // STRUCTS
 typedef struct SHIP
 {
-    double x, y, r, dx, dy;
-    double thrust;
-    double rot_speed;
-    double fire_delay;
-    int lives;
-    int id;
+  double x, y, r, dx, dy;
+  double thrust;
+  double rot_speed;
+  double fire_delay;
+  int lives;
+  int id;
 
-    ALLEGRO_COLOR colour;
+  ALLEGRO_COLOR colour;
 
-    ALLEGRO_VERTEX transformed_v[4];
+  ALLEGRO_VERTEX transformed_v[4];
 } SHIP;
 
 
 typedef struct BULLET
 {
-    double x, y, r, dx, dy, max_time, timer;
-    bool used;
+  double x, y, r, dx, dy, max_time, timer;
+  bool used;
 
-    ALLEGRO_VERTEX transformed_v[4];
+  ALLEGRO_VERTEX transformed_v[4];
 } BULLET;
 
 typedef struct CHARGE
 {
-    double x, y, radius, dx, dy, timer;
-    int state, last_touch;
+  double x, y, radius, dx, dy, timer;
+  int state, last_touch;
 } CHARGE;
 
 
 typedef struct ASTEROID
 {
-    double x, y, r, dx, dy, dr;
+  double x, y, r, dx, dy, dr;
 
-    ALLEGRO_VERTEX template_v[ASTEROID_VERTICES_COUNT];
-    ALLEGRO_VERTEX transformed_v[ASTEROID_VERTICES_COUNT];
+  ALLEGRO_VERTEX template_v[ASTEROID_VERTICES_COUNT];
+  ALLEGRO_VERTEX transformed_v[ASTEROID_VERTICES_COUNT];
 } ASTEROID;
 
 
 typedef struct U_NAC_BOARD
 {
-    double x_0, y_0, length;
-    int winner;
-    int padding;
+  double x_0, y_0, length;
+  int winner;
+  int padding;
 } U_NAC_BOARD;
 
 typedef struct CELL
 {
-    double x_0, y_0, length;
-    int state;
+  double x_0, y_0, length;
+  int state;
 } CELL;
 
 typedef struct NAC_BOARD
 {
-    double x_0, y_0, length;
-    CELL cells[3][3];
-    int winner;
-    double padding;
+  double x_0, y_0, length;
+  CELL cells[3][3];
+  int winner;
+  double padding;
 } NAC_BOARD;
 
 // STRUCTS VARIABLES

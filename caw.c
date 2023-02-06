@@ -10,7 +10,7 @@
                                    |  |  | |_____| |_____/
                                    |__|__| |     | |    \_
 
- */
+*/
 
 #include "caw.h"
 
@@ -126,7 +126,6 @@ void keyboard_init()
 
 void gui_init()
 {  
-
   font = al_create_builtin_font();
   must_init(font, "font");
 }
@@ -256,8 +255,16 @@ void nac_boards_init()
         {
           nac_boards[i][j].cells[k][l].state = 0;
           nac_boards[i][j].cells[k][l].length = nac_boards[i][j].length / 3;
-          nac_boards[i][j].cells[k][l].x_0 = nac_boards[i][j].x_0 + nac_boards[i][j].padding + nac_boards[i][j].cells[k][l].length * k;
-          nac_boards[i][j].cells[k][l].y_0 = nac_boards[i][j].y_0 + nac_boards[i][j].padding + nac_boards[i][j].cells[k][l].length * l;
+
+          nac_boards[i][j].cells[k][l].x_0 = nac_boards[i][j].x_0 +
+                                             nac_boards[i][j].padding + 
+                                             nac_boards[i][j].cells[k][l].length 
+                                             * k;
+
+          nac_boards[i][j].cells[k][l].y_0 = nac_boards[i][j].y_0 + 
+                                             nac_boards[i][j].padding + 
+                                             nac_boards[i][j].cells[k][l].length 
+                                             * l;
         }
       }
     }
@@ -302,9 +309,12 @@ void charge_set(SHIP* ship)
 {
   charge.x = ship->x;
   charge.y = ship->y;
+
   charge.state = 0;
   charge.last_touch = ship->id;
+
   charge.timer = 0.0;
+
   charge.dx = ship->dx + 5.0*cos(ship->r);
   charge.dy = ship->dy + 5.0*sin(ship->r);
 }
@@ -745,6 +755,7 @@ void x_draw(double x_0, double y_0)
   double x_1 = x_0 + 20;
   double y_1 = y_0 + 20;
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
+
   x_0 += 20;
   x_1 -= 20;
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
@@ -916,8 +927,8 @@ int main(int argc, char *argv[])
 
       ship_draw();
       bullets_draw();
-      charge_draw();
       asteroids_draw();
+      charge_draw();
 
       border_draw();
 
