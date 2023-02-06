@@ -213,6 +213,9 @@ void asteroids_init()
     asteroids[i].dy = rand_double(-1.0, 1.0);
     asteroids[i].dr = rand_double(-0.1, 0.1);
 
+    double x_weighting = 0;
+    double y_weighting = 0;
+
     // Creating the asteroid's unique vertex array
     for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
     {
@@ -223,11 +226,20 @@ void asteroids_init()
 
       rotate2D(&asteroids[i].template_v[j], (j * (ALLEGRO_PI/3)));
 
+      x_weighting += asteroids[i].template_v[j].x;
+      y_weighting += asteroids[i].template_v[j].y;
+
       double final_x = asteroids[i].template_v[j].x + asteroids[i].x;
       double final_y = asteroids[i].template_v[j].y + asteroids[i].y;
 
       asteroids[i].transformed_v[j] = 
         (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0, .color = ASTEROID_COLOUR };
+    }
+
+    for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
+    {
+      asteroids[i].template_v[j].x -= x_weighting / ASTEROID_VERTICES_COUNT;
+      asteroids[i].template_v[j].y -= y_weighting / ASTEROID_VERTICES_COUNT;
     }
   }
 }
