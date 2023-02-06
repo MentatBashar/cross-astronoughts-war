@@ -26,7 +26,7 @@
 #define ASTEROID_VERTICES_COUNT 6
 
 #define BULLETS_COUNT   128
-#define ASTEROIDS_COUNT 60
+#define ASTEROIDS_COUNT 40
 
 
 // DISPLAY
@@ -59,7 +59,8 @@ ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
 ALLEGRO_COLOR ASTEROID_COLOUR = { .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
 
 // DEBUG VARIABLES
-int DEBUG_VIEW_COLLIDERS = false;
+int DEBUG_VIEW_COLLIDERS = 0;
+int DEBUG_NO_ASTEROID_COLLISION = 1; 
 
 // MISC VARIABLES
 const int BORDER_LENGTH  = 750;
@@ -74,6 +75,7 @@ typedef struct SHIP
   double rot_speed;
   double fire_delay;
   int lives;
+  int id;
 
   ALLEGRO_COLOR colour;
 
@@ -88,6 +90,12 @@ typedef struct BULLET
 
   ALLEGRO_VERTEX transformed_v[4];
 } BULLET;
+
+typedef struct CHARGE
+{
+  double x, y, radius, dx, dy, timer;
+  int state, last_touch;
+} CHARGE;
 
 
 typedef struct ASTEROID
@@ -106,12 +114,18 @@ typedef struct U_NAC_BOARD
   int padding;
 } U_NAC_BOARD;
 
+typedef struct CELL
+{
+  double x_0, y_0, length;
+  int state;
+} CELL;
 
 typedef struct NAC_BOARD
 {
   double x_0, y_0, length;
-  int squares[3][3];
+  CELL cells[3][3];
   int winner;
+  double padding;
 } NAC_BOARD;
 
 // STRUCTS VARIABLES
@@ -119,11 +133,15 @@ SHIP ships[2];
 
 BULLET bullets[BULLETS_COUNT];
 
+CHARGE charge;
+
 ASTEROID asteroids[ASTEROIDS_COUNT];
 
 U_NAC_BOARD u_nac_board;
 
 NAC_BOARD nac_boards[3][3];
+
+CELL cells[3][3];
 
 
 // FUNCTION PROTOTYPES
@@ -156,26 +174,36 @@ void gui_deinit();
 
 void ship_init();
 void bullets_init();
+void charge_init();
 void asteroids_init();
 void nac_boards_init();
+void cells_init();
 
 void bullets_add(SHIP* ship);
+void charge_set(SHIP* ship);
 
 bool bullet_collision(double x, double y);
+bool charge_collision(double x, double y);
 bool asteroid_collision(double x, double y);
+bool within_nac_board(double x, double y, int t);
+bool within_cell(double x, double y, int i, int j, int t);
 
 void keyboard_update(ALLEGRO_EVENT* event);
-void gui_update();
 void input_update();
 void ship_update(SHIP* ship);
 void bullets_update();
+void charge_update();
 void asteroids_update();
 
 bool game_end_update();
 
-void gui_draw();
 void nac_boards_draw();
+void nac_boards_debug();
+void nac_boards_mark();
+void x_draw(double x_0, double y_0);
+void o_draw(double x_0, double y_0);
 void ship_draw();
 void bullets_draw();
+void charge_draw();
 void asteroids_draw();
 void border_draw();
