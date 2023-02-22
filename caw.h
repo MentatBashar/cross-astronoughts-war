@@ -141,6 +141,8 @@ U_NAC_BOARD u_nac_board;
 
 NAC_BOARD nac_boards[3][3];
 
+NAC_BOARD* active_grid;
+
 CELL cells[3][3];
 
 
