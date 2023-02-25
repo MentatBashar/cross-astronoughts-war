@@ -196,7 +196,7 @@ void charge_init()
   charge.y = rand_int(BORDER_PADDING, BORDER_PADDING + BORDER_LENGTH);
   charge.dx = 0.0;
   charge.dy = 0.0;
-  charge.radius = 2.0;
+  charge.radius = 2.5;
   charge.state = 0;
   charge.timer = 0.0;
 }
@@ -875,7 +875,7 @@ void charge_draw()
 {
   if (charge.state == 0)
   {
-    al_draw_filled_circle(charge.x, charge.y, charge.radius, al_map_rgb_f(1, 1, 1));
+    al_draw_filled_circle(charge.x, charge.y, charge.radius, al_map_rgb_f(1, 0, 1));
   }
 }
 
