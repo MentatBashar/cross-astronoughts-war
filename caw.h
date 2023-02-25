@@ -124,7 +124,7 @@ typedef struct NAC_BOARD
 {
   double x_0, y_0, length;
   CELL cells[3][3];
-  int winner;
+  int winner, marks;
   double padding;
 } NAC_BOARD;
 

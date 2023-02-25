@@ -410,8 +410,17 @@ bool within_cell(double x, double y, int i, int j, int t)
                     // Set cell's mark to be charge's last owner
                     nac_boards[i][j].cells[k][l].state = t;
 
+                    nac_boards[i][j].marks++;
+
                     // Set new active grid
-                    active_grid = &nac_boards[k][l];
+                    if (nac_boards[k][l].marks >= 9)
+                    {
+                      active_grid = NULL;
+                    }
+                    else
+                    {
+                      active_grid = &nac_boards[k][l];
+                    }
 
                     return true;
                 }
