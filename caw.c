@@ -383,11 +383,11 @@ bool within_nac_board(double x, double y, int t)
             if (x > nac_boards[i][j].x_0 &&
                 x < nac_boards[i][j].x_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
                 y > nac_boards[i][j].y_0 &&
-                y < nac_boards[i][j].y_0 + nac_boards[i][j].length + u_nac_board.padding*2)
+                y < nac_boards[i][j].y_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
+                nac_boards[i][j].winner == 0 &&
+                (&nac_boards[i][j] == active_grid || active_grid == NULL))
             {
-                if (nac_boards[i][j].winner == 0)
-
-                    return within_cell(x, y, i, j, t);
+              return within_cell(x, y, i, j, t);
             }
         }
     }
@@ -774,7 +774,6 @@ void nac_boards_draw()
     double x_1 = x_0 + u_nac_board.length	, y_1 = y_0 + u_nac_board.length;
 
     al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
-
   }
   else
   {
