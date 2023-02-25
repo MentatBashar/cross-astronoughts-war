@@ -252,6 +252,8 @@ void nac_boards_init()
   u_nac_board.winner = 0;
   u_nac_board.padding = 20;
 
+  active_grid = NULL;
+
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
@@ -381,11 +383,11 @@ bool within_nac_board(double x, double y, int t)
             if (x > nac_boards[i][j].x_0 &&
                 x < nac_boards[i][j].x_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
                 y > nac_boards[i][j].y_0 &&
-                y < nac_boards[i][j].y_0 + nac_boards[i][j].length + u_nac_board.padding*2)
+                y < nac_boards[i][j].y_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
+                nac_boards[i][j].winner == 0 &&
+                (&nac_boards[i][j] == active_grid || active_grid == NULL))
             {
-                if (nac_boards[i][j].winner == 0)
-
-                    return within_cell(x, y, i, j, t);
+              return within_cell(x, y, i, j, t);
             }
         }
     }
@@ -405,7 +407,21 @@ bool within_cell(double x, double y, int i, int j, int t)
             {
                 if (nac_boards[i][j].cells[k][l].state == 0)
                 {
+                    // Set cell's mark to be charge's last owner
                     nac_boards[i][j].cells[k][l].state = t;
+
+                    nac_boards[i][j].marks++;
+
+                    // Set new active grid
+                    if (nac_boards[k][l].marks >= 9)
+                    {
+                      active_grid = NULL;
+                    }
+                    else
+                    {
+                      active_grid = &nac_boards[k][l];
+                    }
+
                     return true;
                 }
             }
@@ -757,6 +773,28 @@ void nac_boards_draw()
           nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
           NAC_BOARD_COLOUR, 1);
     }
+  }
+
+  // Draw square around active grid
+  if (active_grid == NULL)
+  {
+    // Draw square around whole board
+    double x_0 = u_nac_board.x_0 - u_nac_board.padding/2;
+    double y_0 = u_nac_board.y_0 - u_nac_board.padding/2;
+    double x_1 = x_0 + u_nac_board.length + u_nac_board.padding;
+    double y_1 = y_0 + u_nac_board.length + u_nac_board.padding;
+
+    al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
+  }
+  else
+  {
+    // Draw square around selected nac grid
+    double x_0 = active_grid->x_0 + u_nac_board.padding/2; 
+    double y_0 = active_grid->y_0 + u_nac_board.padding/2;
+    double x_1 = x_0 + active_grid->length + u_nac_board.padding;
+    double y_1 = y_0 + active_grid->length + u_nac_board.padding;
+
+    al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
   }
 }
 
