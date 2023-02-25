@@ -789,7 +789,7 @@ void nac_boards_draw()
   else
   {
     // Draw square around selected nac grid
-    double x_0 = active_grid->x_0	+ u_nac_board.padding/2; 
+    double x_0 = active_grid->x_0 + u_nac_board.padding/2; 
     double y_0 = active_grid->y_0 + u_nac_board.padding/2;
     double x_1 = x_0 + active_grid->length + u_nac_board.padding;
     double y_1 = y_0 + active_grid->length + u_nac_board.padding;
