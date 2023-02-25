@@ -770,18 +770,20 @@ void nac_boards_draw()
   if (active_grid == NULL)
   {
     // Draw square around whole board
-    double x_0 = u_nac_board.x_0			    , y_0 = u_nac_board.y_0;
-    double x_1 = x_0 + u_nac_board.length	, y_1 = y_0 + u_nac_board.length;
+    double x_0 = u_nac_board.x_0 - u_nac_board.padding/2;
+    double y_0 = u_nac_board.y_0 - u_nac_board.padding/2;
+    double x_1 = x_0 + u_nac_board.length + u_nac_board.padding;
+    double y_1 = y_0 + u_nac_board.length + u_nac_board.padding;
 
     al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
   }
   else
   {
     // Draw square around selected nac grid
-    double x_0 = active_grid->x_0	+ u_nac_board.padding; 
-    double y_0 = active_grid->y_0 + u_nac_board.padding;
-    double x_1 = x_0 + active_grid->length;
-    double y_1 = y_0 + active_grid->length;
+    double x_0 = active_grid->x_0	+ u_nac_board.padding/2; 
+    double y_0 = active_grid->y_0 + u_nac_board.padding/2;
+    double x_1 = x_0 + active_grid->length + u_nac_board.padding;
+    double y_1 = y_0 + active_grid->length + u_nac_board.padding;
 
     al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
   }
