@@ -533,7 +533,13 @@ void ship_update(SHIP* ship)
       ship->dr = rand_double(-0.3, 0.3);
 
       if (charge.state == ship->id)
-        charge_init();
+      {
+        charge.x = ship->x;
+        charge.y = ship->y; 
+
+        charge.state = 0;
+        charge.timer = 0.0;
+      }
     }
 
     // Check if ship has picked up the charge
