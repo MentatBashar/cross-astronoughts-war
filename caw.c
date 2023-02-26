@@ -433,7 +433,6 @@ bool within_cell(double x, double y, int i, int j, int mark)
 
 void check_nac_board(int i, int j, int mark)
 {
-  printf("%d", mark);
   for (int l = 0; l < 3; l++)
   {
     int win = 0;
@@ -441,7 +440,6 @@ void check_nac_board(int i, int j, int mark)
     {
       if(nac_boards[i][j].cells[k][l].state == mark)
       {
-        printf("%d%s\n", mark, "incremented");
         win++;
       }
     }
