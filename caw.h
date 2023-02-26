@@ -212,4 +212,3 @@ void bullets_draw();
 void charge_draw();
 void asteroids_draw();
 void border_draw();
-void write_to_board();

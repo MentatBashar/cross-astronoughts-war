@@ -975,16 +975,6 @@ void border_draw()
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
 }
 
-void write_to_board()
-{
-  nac_boards[0][0].cells[0][0].state = 1;
-  nac_boards[0][0].cells[1][1].state = 1;
-  nac_boards[0][0].cells[0][2].state = 1;
-  nac_boards[0][0].cells[2][0].state = 1;
-  nac_boards[0][0].cells[2][2].state = 1;
-  check_nac_board(0, 0, 1);
-}
-
 int main(int argc, char *argv[])
 {
   must_init(al_init(), "Allegro");
@@ -1022,7 +1012,6 @@ int main(int argc, char *argv[])
   bool done = false;
   bool redraw = true;
 
-  write_to_board();
   ALLEGRO_EVENT event;
 
   al_start_timer(timer);
