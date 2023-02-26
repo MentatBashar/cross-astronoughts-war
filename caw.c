@@ -142,7 +142,7 @@ void ship_init()
   ships[0].thrust = 0.1;
   ships[0].rot_speed = 0.1;
   ships[0].fire_delay = 0.0;
-  ships[0].lives = 3;
+  ships[0].lockout_time = 0.0;
   ships[0].colour = P1_COLOUR;
   ships[0].id = 1;
 
@@ -151,7 +151,7 @@ void ship_init()
   ships[1].thrust = 0.1;
   ships[1].rot_speed = 0.1;
   ships[1].fire_delay = 0.0;
-  ships[1].lives = 3;
+  ships[1].lockout_time = 0.0;
   ships[1].colour = P2_COLOUR;
   ships[1].id = 2;
 
@@ -450,105 +450,114 @@ void keyboard_update(ALLEGRO_EVENT* event)
 
 void input_update()
 {
-  if (key[ALLEGRO_KEY_A])
+  if (ships[0].lockout_time <= 0.0)
   {
-    ships[0].r -= ships[0].rot_speed;
-  }
-  if (key[ALLEGRO_KEY_D])
-  {
-    ships[0].r += ships[0].rot_speed;
-  }
-  if (key[ALLEGRO_KEY_W])
-  {
-    ships[0].dx += cos(ships[0].r) * ships[0].thrust;
-    ships[0].dy += sin(ships[0].r) * ships[0].thrust;
-  }
-  if (key[ALLEGRO_KEY_SPACE])
-  {
-    if (ships[0].fire_delay <= 0)
+    if (key[ALLEGRO_KEY_A])
+      ships[0].r -= ships[0].rot_speed;
+    if (key[ALLEGRO_KEY_D])
+      ships[0].r += ships[0].rot_speed;
+
+    if (key[ALLEGRO_KEY_W])
     {
-      bullets_add(&ships[0]);
-      ships[0].fire_delay = 3.0;
+      ships[0].dx += cos(ships[0].r) * ships[0].thrust;
+      ships[0].dy += sin(ships[0].r) * ships[0].thrust;
+    }
+
+    if (key[ALLEGRO_KEY_SPACE])
+    {
+      if (ships[0].fire_delay <= 0)
+      {
+        bullets_add(&ships[0]);
+        ships[0].fire_delay = 3.0;
+      }
+    }
+
+    if (key[ALLEGRO_KEY_Z])
+    {
+      if (charge.state == 1)
+        charge_set(&ships[0]);
     }
   }
 
-  if (key[ALLEGRO_KEY_LEFT])
+  if (ships[1].lockout_time <= 0.0)
   {
-    ships[1].r -= ships[1].rot_speed;
-  }
-  if (key[ALLEGRO_KEY_RIGHT])
-  {
-    ships[1].r += ships[1].rot_speed;
-  }
-  if (key[ALLEGRO_KEY_UP])
-  {
-    ships[1].dx += cos(ships[1].r) * ships[1].thrust;
-    ships[1].dy += sin(ships[1].r) * ships[1].thrust;
-  }
-  if (key[ALLEGRO_KEY_FULLSTOP])
-  {
-    if (ships[1].fire_delay <= 0)
-    {
-      bullets_add(&ships[1]);
-      ships[1].fire_delay = 3.0;
-    }
-  }
+    if (key[ALLEGRO_KEY_LEFT])
+      ships[1].r -= ships[1].rot_speed;
+    if (key[ALLEGRO_KEY_RIGHT])
+      ships[1].r += ships[1].rot_speed;
 
-  if (key[ALLEGRO_KEY_Z])
-  {
-    if (charge.state == 1)
+    if (key[ALLEGRO_KEY_UP])
     {
-      charge_set(&ships[0]);
+      ships[1].dx += cos(ships[1].r) * ships[1].thrust;
+      ships[1].dy += sin(ships[1].r) * ships[1].thrust;
     }
-  }
-  if (key[ALLEGRO_KEY_M])
-  {
-    if (charge.state == 2)
+
+    if (key[ALLEGRO_KEY_FULLSTOP])
     {
-      charge_set(&ships[1]);
+      if (ships[1].fire_delay <= 0)
+      {
+        bullets_add(&ships[1]);
+        ships[1].fire_delay = 3.0;
+      }
+    }
+
+    if (key[ALLEGRO_KEY_M])
+    {
+      if (charge.state == 2)
+        charge_set(&ships[1]);
     }
   }
 }
 
 void ship_update(SHIP* ship)
 {
-  if (ship->lives <= 0)
+  // If ship's controls are locked out, reduce timer
+  if (ship->lockout_time > 0.0)
   {
-    return;
+    ship->lockout_time -= 0.1;
+
+    ship->r += ship->dr;
+
+    // If the ship has just been unlocked, do these things
+    if (ship->lockout_time <= 0.0)
+      ship->dr = 0.0;
   }
-
-  if (bullet_collision(ship->x, ship->y) ||
-      asteroid_collision(ship->x, ship->y))
+  else
   {
-    ship->lives -= 1;
-
-    ship->x = rand_int(BORDER_PADDING, BORDER_LENGTH);
-    ship->y = rand_int(BORDER_PADDING, BORDER_PADDING + BORDER_LENGTH);
-
-    ship->dx = 0; ship->dy = 0;
-
-    if (charge.state == ship->id)
+    // Check if ship collided
+    if (bullet_collision(ship->x, ship->y) ||
+        asteroid_collision(ship->x, ship->y))
     {
-      charge_init();
+      ship->lockout_time = 9.0;
+
+      ship->dr = rand_double(-0.3, 0.3);
+
+      if (charge.state == ship->id)
+        charge_init();
     }
-  }
-  if (charge_collision(ship->x, ship->y))
-  {
-    charge.state = ship->id;
+
+    // Check if ship has picked up the charge
+    if (charge_collision(ship->x, ship->y))
+    {
+      charge.state = ship->id;
+    }
   }
 
   ship->x += ship->dx ; ship->y += ship->dy;
 
+  // Wrapping polar cords
   if (ship->r < 0)
     ship->r = 2*ALLEGRO_PI - ship->r;
   else if(ship->r > 2*ALLEGRO_PI)
     ship->r = 0 + (ship->r - 2*ALLEGRO_PI);
 
+  // Horizontal screen wrap
   if (ship->x <= BORDER_PADDING)
     ship->x =  BORDER_LENGTH + BORDER_PADDING - 1;
   if (ship->x >= BORDER_LENGTH + BORDER_PADDING)
     ship->x =  BORDER_PADDING + 1;
 
+  // Vertical screen wrap
   if (ship->y <= BORDER_PADDING)
     ship->y =  BORDER_LENGTH + BORDER_PADDING - 1;
   if (ship->y >= BORDER_LENGTH + BORDER_PADDING)
@@ -556,7 +565,7 @@ void ship_update(SHIP* ship)
 
   ship->fire_delay -= 0.1;
 
-
+  // Move ship's transform
   for (int i = 0; i < ARRAY_SIZE(ship_v); i++)
   {
     ship->transformed_v[i].x = ship_v[i].x;
@@ -696,24 +705,6 @@ void asteroids_update()
 
 bool game_end_update()
 {
-  if (ships[0].lives <= 0)
-  {
-    al_draw_text(font, 
-        al_map_rgb(255, 0, 0), 
-        BORDER_PADDING + BORDER_LENGTH/2, BORDER_PADDING + BORDER_LENGTH/2, ALLEGRO_ALIGN_CENTRE, 
-        "P2 WINS!");
-    return true;
-  }
-
-  if (ships[1].lives <= 0)
-  {
-    al_draw_text(font, 
-        al_map_rgb(0, 0, 255), 
-        BORDER_PADDING + BORDER_LENGTH/2, BORDER_PADDING + BORDER_LENGTH/2, ALLEGRO_ALIGN_CENTRE, 
-        "P1 WINS!");
-    return true;
-  }
-
   return false;
 }
 
@@ -847,15 +838,9 @@ void nac_boards_mark()
 
 void ship_draw()
 {
-  if (ships[0].lives > 0)
-  {
-    al_draw_prim(ships[0].transformed_v, NULL, NULL, 0, ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
-  }
+  al_draw_prim(ships[0].transformed_v, NULL, NULL, 0, ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
 
-  if (ships[1].lives > 0)
-  {
-    al_draw_prim(ships[1].transformed_v, NULL, NULL, 0, ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
-  }
+  al_draw_prim(ships[1].transformed_v, NULL, NULL, 0, ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
 }
 
 void bullets_draw()

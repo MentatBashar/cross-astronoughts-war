@@ -16,7 +16,7 @@
 #define BUFFER_WIDTH	800
 #define BUFFER_HEIGHT	800
 
-#define DISPLAY_SCALE 	1
+#define DISPLAY_SCALE 	1.5
 #define DISPLAY_WIDTH 	(BUFFER_WIDTH  * DISPLAY_SCALE)
 #define DISPLAY_HEIGHT 	(BUFFER_HEIGHT * DISPLAY_SCALE)
 
@@ -70,11 +70,11 @@ const int BORDER_PADDING =  25;
 // STRUCTS
 typedef struct SHIP
 {
-  double x, y, r, dx, dy;
+  double x, y, r, dx, dy, dr;
   double thrust;
   double rot_speed;
   double fire_delay;
-  int lives;
+  double lockout_time;
   int id;
 
   ALLEGRO_COLOR colour;
