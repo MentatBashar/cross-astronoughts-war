@@ -374,7 +374,7 @@ bool asteroid_collision(double x, double y)
   return false;
 }
 
-bool within_nac_board(double x, double y, int t)
+bool within_nac_board(double x, double y, int mark)
 {
     for (int i = 2; i >= 0; i--)
     {
@@ -387,14 +387,14 @@ bool within_nac_board(double x, double y, int t)
                 nac_boards[i][j].winner == 0 &&
                 (&nac_boards[i][j] == active_grid || active_grid == NULL))
             {
-              return within_cell(x, y, i, j, t);
+              return within_cell(x, y, i, j, mark);
             }
         }
     }
     return false;
 }
 
-bool within_cell(double x, double y, int i, int j, int t)
+bool within_cell(double x, double y, int i, int j, int mark)
 {
     for (int k = 2; k >= 0; k--)
     {
@@ -408,7 +408,7 @@ bool within_cell(double x, double y, int i, int j, int t)
                 if (nac_boards[i][j].cells[k][l].state == 0)
                 {
                     // Set cell's mark to be charge's last owner
-                    nac_boards[i][j].cells[k][l].state = t;
+                    nac_boards[i][j].cells[k][l].state = mark;
 
                     nac_boards[i][j].marks++;
 
@@ -422,12 +422,62 @@ bool within_cell(double x, double y, int i, int j, int t)
                       active_grid = &nac_boards[k][l];
                     }
 
+                    check_nac_board(i, j, mark);
                     return true;
                 }
             }
         }
     }
     return false;
+}
+
+void check_nac_board(int i, int j, int mark)
+{
+  for (int l = 0; l < 3; l++)
+  {
+    int win = 0;
+    for (int k = 0; k < 3; k++)
+    {
+      if(nac_boards[i][j].cells[k][l].state == mark)
+      {
+        win++;
+      }
+    }
+    if (win == 3)
+    {
+      nac_boards[i][j].winner = mark;
+      return;
+    }
+  }
+
+  for (int l = 0; l < 3; l++)
+  {
+    int win = 0;
+    for (int k = 0; k < 3; k++)
+    {
+      if(nac_boards[i][j].cells[k][l].state == mark)
+        win++;
+    }
+    if (win == 3)
+    {
+      nac_boards[i][j].winner = mark;
+      return;
+    }
+  }
+  if (nac_boards[i][j].cells[0][0].state == mark &&
+  nac_boards[i][j].cells[1][1].state == mark &&
+  nac_boards[i][j].cells[2][2].state == mark)
+  {
+    nac_boards[i][j].winner = mark;
+    return;
+  }
+  if (nac_boards[i][j].cells[2][0].state == mark &&
+  nac_boards[i][j].cells[1][1].state == mark &&
+  nac_boards[i][j].cells[0][2].state == mark)
+  {
+    nac_boards[i][j].winner = mark;
+    return;
+  }
 }
 
 void keyboard_update(ALLEGRO_EVENT* event)
@@ -807,6 +857,18 @@ void x_draw(double x_0, double y_0)
   x_1 -= 20;
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
 }
+void big_x_draw(double x_0, double y_0)
+{
+  x_0 += 10 * 3;
+  y_0 += 10 * 3;
+  double x_1 = x_0 + 20 * 5;
+  double y_1 = y_0 + 20 * 5;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
+
+  x_0 += 20 * 5;
+  x_1 -= 20 * 5;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
+}
 
 void o_draw(double x_0, double y_0)
 {
@@ -817,22 +879,38 @@ void o_draw(double x_0, double y_0)
   y_0 += r;
   al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 1);
 }
-
+void big_o_draw(double x_0, double y_0)
+{
+  x_0 += 10 * 3;
+  y_0 += 10 * 3;
+  double r = 10 * 5;
+  x_0 += r;
+  y_0 += r;
+  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 2.5);
+}
 void nac_boards_mark()
 {
     for (int i = 0; i < 3; i++)
     {
         for (int j = 0; j < 3; j++)
         {
+            if (nac_boards[i][j].winner == 1)
+            {
+              big_o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
+            }
+            else if (nac_boards[i][j].winner == 2)
+            {
+              big_x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
+            }
             for (int k = 0; k < 3; k++)
             {
                 for (int l = 0; l < 3; l++)
                 {
-                    if (nac_boards[i][j].cells[k][l].state == 1)
+                    if (nac_boards[i][j].cells[k][l].state == 1 && nac_boards[i][j].winner == 0)
                     {
                         o_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
                     }
-                    else if (nac_boards[i][j].cells[k][l].state == 2)
+                    else if (nac_boards[i][j].cells[k][l].state == 2 && nac_boards[i][j].winner == 0)
                     {
                         x_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
                     }
@@ -886,8 +964,6 @@ void border_draw()
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
 }
 
-
-
 int main(int argc, char *argv[])
 {
   must_init(al_init(), "Allegro");
@@ -924,6 +1000,7 @@ int main(int argc, char *argv[])
 
   bool done = false;
   bool redraw = true;
+
   ALLEGRO_EVENT event;
 
   al_start_timer(timer);
