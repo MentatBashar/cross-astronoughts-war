@@ -17,27 +17,27 @@
 
 void flag_reader(int argc, char* argv[])
 {
-  if (argc > 1)
-  {
-    for (int i = 1; i < argc; i++)
-    {
-      int opt = getopt(argc, argv, "d");
-      if (opt == -1)
-      {
-        break;
-      }
+    int opt;
 
+    while((opt = getopt(argc, argv, "ds:")) != -1)
+    {
       switch (opt)
       {
         case 'd':
           DEBUG_VIEW_COLLIDERS++;
           DEBUG_NO_ASTEROID_COLLISION--;
           break;
+        case 's':
+          DISPLAY_SCALE = strtol(optarg, (char**) NULL, 10);
+
+          if (DISPLAY_SCALE <= 0)
+            printf("Cannot have a negative or zero-value display scale\n");
+
+          break;
         default:
           exit(1);
       }
     }
-  } 
 }
 
 void rotate2D(ALLEGRO_VERTEX* v, double r)
@@ -77,6 +77,12 @@ void must_init(bool test, const char *description)
 
 void display_init()
 {
+  if (DISPLAY_SCALE <= 0)
+    DISPLAY_SCALE = 1;
+
+  DISPLAY_WIDTH  = (BUFFER_WIDTH  * DISPLAY_SCALE);
+  DISPLAY_HEIGHT = (BUFFER_HEIGHT * DISPLAY_SCALE);
+
   al_set_new_window_title("Cross Astronoughts War");
   display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
   must_init(display, "display");
