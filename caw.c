@@ -28,9 +28,9 @@ void flag_reader(int argc, char* argv[])
           DEBUG_NO_ASTEROID_COLLISION--;
           break;
         case 's':
-          DISPLAY_SCALE = strtol(optarg, (char**) NULL, 10);
+          display_scale = strtol(optarg, (char**) NULL, 10);
 
-          if (DISPLAY_SCALE <= 0)
+          if (display_scale <= 0)
             printf("Cannot have a negative or zero-value display scale\n");
 
           break;
@@ -77,14 +77,14 @@ void must_init(bool test, const char *description)
 
 void display_init()
 {
-  if (DISPLAY_SCALE <= 0)
-    DISPLAY_SCALE = 1;
+  if (display_scale <= 0)
+    display_scale= 1;
 
-  DISPLAY_WIDTH  = (BUFFER_WIDTH  * DISPLAY_SCALE);
-  DISPLAY_HEIGHT = (BUFFER_HEIGHT * DISPLAY_SCALE);
+  display_width  = (BUFFER_WIDTH  * display_scale);
+  display_height = (BUFFER_HEIGHT * display_scale);
 
   al_set_new_window_title("Cross Astronoughts War");
-  display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+  display = al_create_display(display_width, display_height);
   must_init(display, "display");
 
   buffer = al_create_bitmap(BUFFER_WIDTH, BUFFER_HEIGHT);
@@ -105,7 +105,8 @@ void display_pre_draw()
 void display_post_draw()
 {
   al_set_target_backbuffer(display);
-  al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+  al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, 0, 0,
+                        display_width,display_height, 0);
 
   al_flip_display();
 }

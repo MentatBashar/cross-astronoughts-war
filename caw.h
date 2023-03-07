@@ -26,9 +26,9 @@
 
 
 // DISPLAY
-int DISPLAY_SCALE = 0;
-int DISPLAY_WIDTH; 
-int DISPLAY_HEIGHT;
+int display_scale = 0;
+int display_width; 
+int display_height;
 
 ALLEGRO_DISPLAY* display;
 ALLEGRO_BITMAP* buffer;
