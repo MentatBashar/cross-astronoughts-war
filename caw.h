@@ -66,7 +66,9 @@ int DEBUG_NO_ASTEROID_COLLISION = 1;
 const int BORDER_LENGTH  = 750;
 const int BORDER_PADDING =  25;
 
-
+ALLEGRO_BITMAP* josh;
+typedef enum { MAIN_MENU, GAME } SCREEN;
+SCREEN current_screen = 0;
 // STRUCTS
 typedef struct SHIP
 {
@@ -171,8 +173,7 @@ void audio_deinit();
 
 void keyboard_init();
 
-void gui_init();
-void gui_deinit();
+void main_menu_init();
 
 void ship_init();
 void bullets_init();
@@ -192,6 +193,7 @@ bool within_cell(double x, double y, int i, int j, int mark);
 void check_nac_board(int i, int j, int mark);
 
 void keyboard_update(ALLEGRO_EVENT* event);
+void main_menu_update();
 void input_update();
 void ship_update(SHIP* ship);
 void bullets_update();
@@ -200,6 +202,7 @@ void asteroids_update();
 
 bool game_end_update();
 
+void main_menu_draw();
 void nac_boards_draw();
 void nac_boards_debug();
 void nac_boards_mark();

@@ -131,15 +131,10 @@ void keyboard_init()
   memset(key, 0, sizeof(key));
 }
 
-void gui_init()
-{  
-  font = al_create_builtin_font();
-  must_init(font, "font");
-}
-
-void gui_deinit()
+void main_menu_init()
 {
-  al_destroy_font(font);
+  josh = al_load_bitmap("josh.png");
+  must_init(josh, "josh");
 }
 
 void ship_init()
@@ -505,6 +500,14 @@ void keyboard_update(ALLEGRO_EVENT* event)
   }
 }
 
+void main_menu_update()
+{
+  if (key[ALLEGRO_KEY_ENTER])
+  {
+    current_screen = GAME;
+  }
+}
+
 void input_update()
 {
   if (ships[0].lockout_time <= 0.0)
@@ -771,6 +774,11 @@ bool game_end_update()
   return false;
 }
 
+void main_menu_draw()
+{
+  al_draw_bitmap(josh, 0, 0, 0);
+}
+
 void nac_boards_draw()
 {
   // Draw u_nac_board
@@ -991,7 +999,6 @@ int main(int argc, char *argv[])
 
   display_init();
   audio_init();
-  gui_init();
 
   al_register_event_source(queue, al_get_keyboard_event_source());
   al_register_event_source(queue, al_get_display_event_source(display));
@@ -999,6 +1006,7 @@ int main(int argc, char *argv[])
 
   srand(time(NULL));
 
+  main_menu_init();
   ship_init();
   bullets_init();
   charge_init();
@@ -1018,12 +1026,21 @@ int main(int argc, char *argv[])
     switch(event.type)
     {
       case ALLEGRO_EVENT_TIMER:
-        input_update();
-        ship_update(&ships[0]);
-        ship_update(&ships[1]);
-        bullets_update();
-        charge_update();
-        asteroids_update();
+        switch(current_screen)
+        {
+          case MAIN_MENU:
+            main_menu_update();
+            break;
+
+          case GAME:
+            input_update();
+            ship_update(&ships[0]);
+            ship_update(&ships[1]);
+            bullets_update();
+            charge_update();
+            asteroids_update();
+            break;
+        }
 
         if (key[ALLEGRO_KEY_ESCAPE])
           done = true;
@@ -1047,16 +1064,24 @@ int main(int argc, char *argv[])
 
       al_clear_to_color(al_map_rgb(0, 0, 0));
 
-      nac_boards_draw();
-      nac_boards_mark();
+        switch(current_screen)
+        {
+          case MAIN_MENU:
+            main_menu_draw();
+            break;
 
-      ship_draw();
-      bullets_draw();
-      asteroids_draw();
-      charge_draw();
+          case GAME:
+            nac_boards_draw();
+            nac_boards_mark();
 
-      border_draw();
+            ship_draw();
+            bullets_draw();
+            asteroids_draw();
+            charge_draw();
 
+            border_draw();
+            break;
+        }
       done = game_end_update();
 
       display_post_draw();
@@ -1072,7 +1097,6 @@ int main(int argc, char *argv[])
 
   display_deinit();
   audio_deinit();
-  gui_deinit();
 
   al_destroy_timer(timer);
   al_destroy_event_queue(queue);
