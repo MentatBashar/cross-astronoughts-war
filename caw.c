@@ -809,7 +809,6 @@ void main_menu_draw()
 void game_draw()
 {
   nac_boards_draw();
-  nac_boards_mark();
 
   ship_draw();
   bullets_draw();
@@ -875,6 +874,40 @@ void nac_boards_draw()
           nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
           nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
           NAC_BOARD_COLOUR, 1);
+
+      // Drawing the board marks
+      if (nac_boards[i][j].winner == 1)
+      {
+        o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0, true);
+      }
+      else if (nac_boards[i][j].winner == 2)
+      {
+        x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0, true);
+      }
+
+      // Drawing the cell marks
+      for (int k = 0; k < 3; k++)
+      {
+        for (int l = 0; l < 3; l++)
+        {
+          if (!nac_boards[i][j].winner)
+          {
+            switch (nac_boards[i][j].cells[k][l].state)
+            {
+              case 1:
+                o_draw(nac_boards[i][j].cells[k][l].x_0, 
+                       nac_boards[i][j].cells[k][l].y_0,
+                       false);
+                break;
+              case 2:
+                x_draw(nac_boards[i][j].cells[k][l].x_0, 
+                       nac_boards[i][j].cells[k][l].y_0,
+                       false);
+                break;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -901,91 +934,34 @@ void nac_boards_draw()
   }
 }
 
-void nac_boards_mark()
+void x_draw(double x_0, double y_0, bool is_big)
 {
-  for (int i = 0; i < 3; i++)
-  {
-    for (int j = 0; j < 3; j++)
-    {
-      // Drawing the board marks
-      if (nac_boards[i][j].winner == 1)
-      {
-        big_o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
-      }
-      else if (nac_boards[i][j].winner == 2)
-      {
-        big_x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
-      }
+  x_0 += 10 + (2 * is_big);
+  y_0 += 10 + (2 * is_big);
 
-      // Drawing the cell marks
-      for (int k = 0; k < 3; k++)
-      {
-        for (int l = 0; l < 3; l++)
-        {
-          if (!nac_boards[i][j].winner)
-          {
-            switch (nac_boards[i][j].cells[k][l].state)
-            {
-              case 1:
-                o_draw(nac_boards[i][j].cells[k][l].x_0, 
-                    nac_boards[i][j].cells[k][l].y_0);
-                break;
-              case 2:
-                x_draw(nac_boards[i][j].cells[k][l].x_0, 
-                    nac_boards[i][j].cells[k][l].y_0);
-                break;
-            }
-          }
-        }
-      }
-    }
-  }
+  double x_1 = x_0 + 20 + (4 * is_big);
+  double y_1 = y_0 + 20 + (4 * is_big);
+
+  double w = 1 + (1.5 * is_big);
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), w);
+
+  x_0 += 20 + (4 * is_big);
+  x_1 -= 20 + (4 * is_big);
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), w);
 }
 
-void x_draw(double x_0, double y_0)
+void o_draw(double x_0, double y_0, bool is_big)
 {
-  x_0 += 10;
-  y_0 += 10;
-  double x_1 = x_0 + 20;
-  double y_1 = y_0 + 20;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
+  x_0 += 10 + (2 * is_big);
+  y_0 += 10 + (2 * is_big);
 
-  x_0 += 20;
-  x_1 -= 20;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
-}
+  double r = 10 + (4 * is_big);
 
-void big_x_draw(double x_0, double y_0)
-{
-  x_0 += 10 * 3;
-  y_0 += 10 * 3;
-  double x_1 = x_0 + 20 * 5;
-  double y_1 = y_0 + 20 * 5;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
-
-  x_0 += 20 * 5;
-  x_1 -= 20 * 5;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
-}
-
-void o_draw(double x_0, double y_0)
-{
-  x_0 += 10;
-  y_0 += 10;
-  double r = 10;
   x_0 += r;
   y_0 += r;
-  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 1);
-}
 
-void big_o_draw(double x_0, double y_0)
-{
-  x_0 += 10 * 3;
-  y_0 += 10 * 3;
-  double r = 10 * 5;
-  x_0 += r;
-  y_0 += r;
-  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 2.5);
+  double w = 1 + (1.5 * is_big);
+  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), w);
 }
 
 

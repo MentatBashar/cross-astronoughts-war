@@ -211,9 +211,7 @@ void ship_update(SHIP* ship);
 void bullets_update();
 void charge_update();
 void asteroids_update();
-
 bool game_end_update();
-
 
 void main_menu_draw();
 
@@ -221,11 +219,8 @@ void game_draw();
 
 void nac_boards_draw();
 
-void nac_boards_mark();
-void x_draw(double x_0, double y_0);
-void big_x_draw(double x_0, double y_0);
-void o_draw(double x_0, double y_0);
-void big_o_draw(double x_0, double y_0);
+void x_draw(double x_0, double y_0, bool is_big);
+void o_draw(double x_0, double y_0, bool is_big);
 
 void ship_draw();
 void bullets_draw();
