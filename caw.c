@@ -1101,16 +1101,16 @@ int main(int argc, char *argv[])
 
       al_clear_to_color(al_map_rgb(0, 0, 0));
 
-        switch(current_screen)
-        {
-          case MAIN_MENU:
-            main_menu_draw();
-            break;
+      switch(current_screen)
+      {
+        case MAIN_MENU:
+          main_menu_draw();
+          break;
 
-          case GAME:
-            game_draw();
-            break;
-        }
+        case GAME:
+          game_draw();
+          break;
+      }
 
       done = game_end_update();
 
