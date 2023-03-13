@@ -66,9 +66,11 @@ int DEBUG_NO_ASTEROID_COLLISION = 1;
 const int BORDER_LENGTH  = 750;
 const int BORDER_PADDING =  25;
 
+// TEMP LOC FOR ENUMS AND TEST THINGS
 ALLEGRO_BITMAP* josh;
 typedef enum { MAIN_MENU, GAME } SCREEN;
 SCREEN current_screen = 0;
+
 // STRUCTS
 typedef struct SHIP
 {
@@ -130,6 +132,7 @@ typedef struct NAC_BOARD
   double padding;
 } NAC_BOARD;
 
+
 // STRUCTS VARIABLES
 SHIP ships[2];
 
@@ -163,6 +166,7 @@ bool circular_collision(double x_0, double y_0, double x_1, double y_1);
 
 // INIT FUNCTIONS
 void must_init(bool test, const char *description);
+
 void display_init();
 void display_deinit();
 void display_pre_draw();
@@ -173,14 +177,17 @@ void audio_deinit();
 
 void keyboard_init();
 
+// Main menu inits
 void main_menu_init();
+
+// Game inits
+void game_init();
 
 void ship_init();
 void bullets_init();
 void charge_init();
 void asteroids_init();
 void nac_boards_init();
-void cells_init();
 
 void bullets_add(SHIP* ship);
 void charge_set(SHIP* ship);
@@ -188,12 +195,17 @@ void charge_set(SHIP* ship);
 bool bullet_collision(double x, double y);
 bool charge_collision(double x, double y);
 bool asteroid_collision(double x, double y);
+
 bool within_nac_board(double x, double y, int mark);
 bool within_cell(double x, double y, int i, int j, int mark);
 void check_nac_board(int i, int j, int mark);
 
 void keyboard_update(ALLEGRO_EVENT* event);
+
 void main_menu_update();
+
+void game_update();
+
 void input_update();
 void ship_update(SHIP* ship);
 void bullets_update();
@@ -202,14 +214,19 @@ void asteroids_update();
 
 bool game_end_update();
 
+
 void main_menu_draw();
+
+void game_draw();
+
 void nac_boards_draw();
-void nac_boards_debug();
+
 void nac_boards_mark();
 void x_draw(double x_0, double y_0);
 void big_x_draw(double x_0, double y_0);
 void o_draw(double x_0, double y_0);
 void big_o_draw(double x_0, double y_0);
+
 void ship_draw();
 void bullets_draw();
 void charge_draw();

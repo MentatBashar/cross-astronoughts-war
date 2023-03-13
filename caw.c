@@ -137,6 +137,15 @@ void main_menu_init()
   must_init(josh, "josh");
 }
 
+void game_init()
+{
+  ship_init();
+  bullets_init();
+  charge_init();
+  asteroids_init();
+  nac_boards_init();
+}
+
 void ship_init()
 {
   ships[0].x = 2*BORDER_PADDING ; ships[0].y = BORDER_LENGTH/2 ; ships[0].r = 0;
@@ -335,6 +344,7 @@ void charge_set(SHIP* ship)
   charge.dy = ship->dy + 5.0*sin(ship->r);
 }
 
+
 bool bullet_collision(double x, double y)
 {
   for (int i = 0; i < BULLETS_COUNT; i++)
@@ -375,6 +385,7 @@ bool asteroid_collision(double x, double y)
 
   return false;
 }
+
 
 bool within_nac_board(double x, double y, int mark)
 {
@@ -482,6 +493,7 @@ void check_nac_board(int i, int j, int mark)
   }
 }
 
+
 void keyboard_update(ALLEGRO_EVENT* event)
 {
   switch(event->type)
@@ -500,6 +512,7 @@ void keyboard_update(ALLEGRO_EVENT* event)
   }
 }
 
+
 void main_menu_update()
 {
   if (key[ALLEGRO_KEY_ENTER])
@@ -507,6 +520,18 @@ void main_menu_update()
     current_screen = GAME;
   }
 }
+
+
+void game_update()
+{
+  input_update();
+  ship_update(&ships[0]);
+  ship_update(&ships[1]);
+  bullets_update();
+  charge_update();
+  asteroids_update(); 
+}
+
 
 void input_update()
 {
@@ -774,10 +799,26 @@ bool game_end_update()
   return false;
 }
 
+
 void main_menu_draw()
 {
   al_draw_bitmap(josh, 0, 0, 0);
 }
+
+
+void game_draw()
+{
+  nac_boards_draw();
+  nac_boards_mark();
+
+  ship_draw();
+  bullets_draw();
+  asteroids_draw();
+  charge_draw();
+
+  border_draw();
+}
+
 
 void nac_boards_draw()
 {
@@ -860,49 +901,6 @@ void nac_boards_draw()
   }
 }
 
-void x_draw(double x_0, double y_0)
-{
-  x_0 += 10;
-  y_0 += 10;
-  double x_1 = x_0 + 20;
-  double y_1 = y_0 + 20;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
-
-  x_0 += 20;
-  x_1 -= 20;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
-}
-void big_x_draw(double x_0, double y_0)
-{
-  x_0 += 10 * 3;
-  y_0 += 10 * 3;
-  double x_1 = x_0 + 20 * 5;
-  double y_1 = y_0 + 20 * 5;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
-
-  x_0 += 20 * 5;
-  x_1 -= 20 * 5;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
-}
-
-void o_draw(double x_0, double y_0)
-{
-  x_0 += 10;
-  y_0 += 10;
-  double r = 10;
-  x_0 += r;
-  y_0 += r;
-  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 1);
-}
-void big_o_draw(double x_0, double y_0)
-{
-  x_0 += 10 * 3;
-  y_0 += 10 * 3;
-  double r = 10 * 5;
-  x_0 += r;
-  y_0 += r;
-  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 2.5);
-}
 void nac_boards_mark()
 {
     for (int i = 0; i < 3; i++)
@@ -934,6 +932,53 @@ void nac_boards_mark()
         }
     }
 }
+
+void x_draw(double x_0, double y_0)
+{
+  x_0 += 10;
+  y_0 += 10;
+  double x_1 = x_0 + 20;
+  double y_1 = y_0 + 20;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
+
+  x_0 += 20;
+  x_1 -= 20;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
+}
+
+void big_x_draw(double x_0, double y_0)
+{
+  x_0 += 10 * 3;
+  y_0 += 10 * 3;
+  double x_1 = x_0 + 20 * 5;
+  double y_1 = y_0 + 20 * 5;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
+
+  x_0 += 20 * 5;
+  x_1 -= 20 * 5;
+  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 2.5);
+}
+
+void o_draw(double x_0, double y_0)
+{
+  x_0 += 10;
+  y_0 += 10;
+  double r = 10;
+  x_0 += r;
+  y_0 += r;
+  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 1);
+}
+
+void big_o_draw(double x_0, double y_0)
+{
+  x_0 += 10 * 3;
+  y_0 += 10 * 3;
+  double r = 10 * 5;
+  x_0 += r;
+  y_0 += r;
+  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 2.5);
+}
+
 
 void ship_draw()
 {
@@ -973,11 +1018,12 @@ void asteroids_draw()
 
 void border_draw()
 {
-  double x_0 = BORDER_PADDING			            , y_0 = BORDER_PADDING;
+  double x_0 = BORDER_PADDING                 , y_0 = BORDER_PADDING;
   double x_1 = BORDER_LENGTH + BORDER_PADDING	, y_1 = BORDER_LENGTH + BORDER_PADDING;
 
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -1007,11 +1053,7 @@ int main(int argc, char *argv[])
   srand(time(NULL));
 
   main_menu_init();
-  ship_init();
-  bullets_init();
-  charge_init();
-  asteroids_init();
-  nac_boards_init();
+  game_init(); 
 
   bool done = false;
   bool redraw = true;
@@ -1033,12 +1075,7 @@ int main(int argc, char *argv[])
             break;
 
           case GAME:
-            input_update();
-            ship_update(&ships[0]);
-            ship_update(&ships[1]);
-            bullets_update();
-            charge_update();
-            asteroids_update();
+            game_update();
             break;
         }
 
@@ -1071,17 +1108,10 @@ int main(int argc, char *argv[])
             break;
 
           case GAME:
-            nac_boards_draw();
-            nac_boards_mark();
-
-            ship_draw();
-            bullets_draw();
-            asteroids_draw();
-            charge_draw();
-
-            border_draw();
+            game_draw();
             break;
         }
+
       done = game_end_update();
 
       display_post_draw();
