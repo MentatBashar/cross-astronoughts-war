@@ -903,34 +903,43 @@ void nac_boards_draw()
 
 void nac_boards_mark()
 {
-    for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
     {
-        for (int j = 0; j < 3; j++)
+      // Drawing the board marks
+      if (nac_boards[i][j].winner == 1)
+      {
+        big_o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
+      }
+      else if (nac_boards[i][j].winner == 2)
+      {
+        big_x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
+      }
+
+      // Drawing the cell marks
+      for (int k = 0; k < 3; k++)
+      {
+        for (int l = 0; l < 3; l++)
         {
-            if (nac_boards[i][j].winner == 1)
+          if (!nac_boards[i][j].winner)
+          {
+            switch (nac_boards[i][j].cells[k][l].state)
             {
-              big_o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
+              case 1:
+                o_draw(nac_boards[i][j].cells[k][l].x_0, 
+                    nac_boards[i][j].cells[k][l].y_0);
+                break;
+              case 2:
+                x_draw(nac_boards[i][j].cells[k][l].x_0, 
+                    nac_boards[i][j].cells[k][l].y_0);
+                break;
             }
-            else if (nac_boards[i][j].winner == 2)
-            {
-              big_x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
-            }
-            for (int k = 0; k < 3; k++)
-            {
-                for (int l = 0; l < 3; l++)
-                {
-                    if (nac_boards[i][j].cells[k][l].state == 1 && nac_boards[i][j].winner == 0)
-                    {
-                        o_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
-                    }
-                    else if (nac_boards[i][j].cells[k][l].state == 2 && nac_boards[i][j].winner == 0)
-                    {
-                        x_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
-                    }
-                }
-            }
+          }
         }
+      }
     }
+  }
 }
 
 void x_draw(double x_0, double y_0)
