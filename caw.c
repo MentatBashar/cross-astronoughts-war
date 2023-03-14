@@ -389,9 +389,9 @@ bool asteroid_collision(double x, double y)
 
 bool within_nac_board(double x, double y, int mark)
 {
-    for (int i = 2; i >= 0; i--)
+    for (int i = 0; i <= 2; i++)
     {
-        for (int j = 2; j >= 0; j--)
+        for (int j = 0; j <= 2; j++)
         {
             if (x > nac_boards[i][j].x_0 &&
                 x < nac_boards[i][j].x_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
@@ -400,95 +400,100 @@ bool within_nac_board(double x, double y, int mark)
                 nac_boards[i][j].winner == 0 &&
                 (&nac_boards[i][j] == active_grid || active_grid == NULL))
             {
-              return within_cell(x, y, i, j, mark);
+              return within_cell(x, y, &nac_boards[i][j], mark);
             }
         }
     }
+
     return false;
 }
 
-bool within_cell(double x, double y, int i, int j, int mark)
+bool within_cell(double x, double y, NAC_BOARD* board, int mark)
 {
-    for (int k = 2; k >= 0; k--)
-    {
-        for (int l = 2; l >= 0; l--)
-        {
-            if (x > nac_boards[i][j].cells[k][l].x_0 &&
-                x < nac_boards[i][j].cells[k][l].x_0 + nac_boards[i][j].cells[k][l].length &&
-                y > nac_boards[i][j].cells[k][l].y_0 &&
-                y < nac_boards[i][j].cells[k][l].y_0 + nac_boards[i][j].cells[k][l].length)
-            {
-                if (nac_boards[i][j].cells[k][l].state == 0)
-                {
-                    // Set cell's mark to be charge's last owner
-                    nac_boards[i][j].cells[k][l].state = mark;
-
-                    nac_boards[i][j].marks++;
-
-                    // Set new active grid
-                    if (nac_boards[k][l].marks >= 9)
-                    {
-                      active_grid = NULL;
-                    }
-                    else
-                    {
-                      active_grid = &nac_boards[k][l];
-                    }
-
-                    check_nac_board(i, j, mark);
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-void check_nac_board(int i, int j, int mark)
-{
-  for (int l = 0; l < 3; l++)
+  for (int k = 0; k <= 2; k++)
   {
-    int win = 0;
-    for (int k = 0; k < 3; k++)
+    for (int l = 0; l <= 2; l++)
     {
-      if(nac_boards[i][j].cells[k][l].state == mark)
+      if (x > board->cells[k][l].x_0 &&
+          x < board->cells[k][l].x_0 + board->cells[k][l].length &&
+          y > board->cells[k][l].y_0 &&
+          y < board->cells[k][l].y_0 + board->cells[k][l].length &&
+          board->cells[k][l].state == 0)
       {
-        win++;
+        // Set cell's mark to be charge's last owner
+        board->cells[k][l].state = mark;
+
+        board->marks++;
+
+        // Set new active grid
+        if (board->marks >= 9)
+        {
+          active_grid = NULL;
+        }
+        else
+        {
+          active_grid = &nac_boards[k][l];
+        }
+
+        check_nac_board(board, mark);
+
+        return true;
       }
     }
-    if (win == 3)
+  }
+
+  return false;
+}
+
+void check_nac_board(NAC_BOARD* board, int mark)
+{
+  for (int k = 0; k <= 2; k++)
+  {
+    int adj_count = 0;
+    for (int l = 0; l <= 2; l++)
     {
-      nac_boards[i][j].winner = mark;
+      if(board->cells[k][l].state == mark)
+      {
+        adj_count++;
+      }
+    }
+
+    if (adj_count == 3)
+    {
+      board->winner = mark;
       return;
     }
   }
 
-  for (int l = 0; l < 3; l++)
+  for (int l = 0; l <= 2; l++)
   {
-    int win = 0;
-    for (int k = 0; k < 3; k++)
+    int adj_count = 0;
+    for (int k = 0; k <= 2; k++)
     {
-      if(nac_boards[i][j].cells[k][l].state == mark)
-        win++;
+      if(board->cells[k][l].state == mark)
+        adj_count++;
     }
-    if (win == 3)
+
+    if (adj_count == 3)
     {
-      nac_boards[i][j].winner = mark;
+      board->winner = mark;
       return;
     }
   }
-  if (nac_boards[i][j].cells[0][0].state == mark &&
-  nac_boards[i][j].cells[1][1].state == mark &&
-  nac_boards[i][j].cells[2][2].state == mark)
+
+  if (board->cells[0][0].state == mark &&
+      board->cells[1][1].state == mark &&
+      board->cells[2][2].state == mark)
   {
-    nac_boards[i][j].winner = mark;
+    board->winner = mark;
     return;
   }
-  if (nac_boards[i][j].cells[2][0].state == mark &&
-  nac_boards[i][j].cells[1][1].state == mark &&
-  nac_boards[i][j].cells[0][2].state == mark)
+
+  if (board->cells[2][0].state == mark &&
+      board->cells[1][1].state == mark &&
+      board->cells[0][2].state == mark)
   {
-    nac_boards[i][j].winner = mark;
+    board->winner = mark;
     return;
   }
 }

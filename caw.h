@@ -197,8 +197,8 @@ bool charge_collision(double x, double y);
 bool asteroid_collision(double x, double y);
 
 bool within_nac_board(double x, double y, int mark);
-bool within_cell(double x, double y, int i, int j, int mark);
-void check_nac_board(int i, int j, int mark);
+bool within_cell(double x, double y, NAC_BOARD* board, int mark);
+void check_nac_board(NAC_BOARD* board, int mark);
 
 void keyboard_update(ALLEGRO_EVENT* event);
 
