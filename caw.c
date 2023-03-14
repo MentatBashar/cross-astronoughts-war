@@ -65,8 +65,10 @@ float rand_double(double lo, double hi)
 
 bool circular_collision(double x_0, double y_0, double x_1, double y_1)
 {
+  // Assumption: Two entities with the same cords are the same object
   if (x_0 == x_1 && y_0 == y_1)
     return false;
+  // Circular distance with Pythagoras
   if ( sqrt(pow((x_0 - x_1), 2) + pow((y_0 - y_1), 2)) <= 7.0)
     return true;
   return false;
@@ -83,7 +85,7 @@ void must_init(bool test, const char *description)
 void display_init()
 {
   if (display_scale <= 0)
-    display_scale= 1;
+    display_scale = 1;
 
   display_width  = (BUFFER_WIDTH  * display_scale);
   display_height = (BUFFER_HEIGHT * display_scale);
