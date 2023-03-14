@@ -113,9 +113,8 @@ typedef struct ASTEROID
 
 typedef struct U_NAC_BOARD
 {
-  double x_0, y_0, length;
+  double x_0, y_0, length, padding;
   int winner;
-  int padding;
 } U_NAC_BOARD;
 
 typedef struct CELL
@@ -126,10 +125,9 @@ typedef struct CELL
 
 typedef struct NAC_BOARD
 {
-  double x_0, y_0, length;
-  CELL cells[3][3];
+  double x_0, y_0, length, padding;
   int winner, marks;
-  double padding;
+  CELL cells[3][3];
 } NAC_BOARD;
 
 
@@ -155,7 +153,7 @@ CELL cells[3][3];
 
 // UTILITY FUNCTIONS
 
-void flag_reader(int argc, char* argv[]);
+void param_reader(int argc, char* argv[]);
 
 // 2D Rotation Helper Function
 void rotate2D(ALLEGRO_VERTEX* v, double r);

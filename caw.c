@@ -15,7 +15,7 @@
 #include "caw.h"
 
 
-void flag_reader(int argc, char* argv[])
+void param_reader(int argc, char* argv[])
 {
     int opt;
 
@@ -27,13 +27,14 @@ void flag_reader(int argc, char* argv[])
           DEBUG_VIEW_COLLIDERS++;
           DEBUG_NO_ASTEROID_COLLISION--;
           break;
+
         case 's':
           display_scale = strtol(optarg, (char**) NULL, 10);
 
           if (display_scale <= 0)
             printf("Cannot have a negative or zero-value display scale\n");
-
           break;
+
         default:
           exit(1);
       }
@@ -43,9 +44,7 @@ void flag_reader(int argc, char* argv[])
 void rotate2D(ALLEGRO_VERTEX* v, double r)
 {
   if (r == 0.0)
-  {
     return;
-  }
 
   double rot_x = v->x*cos(r) - v->y*sin(r);
   double rot_y = v->x*sin(r) + v->y*cos(r);
@@ -53,11 +52,13 @@ void rotate2D(ALLEGRO_VERTEX* v, double r)
   v->x = rot_x ; v->y = rot_y;
 }
 
+// lo <= x < hi
 int rand_int(int lo, int hi)
 {
   return lo + (rand() % (hi - lo));
 }
 
+// lo <= x < hi
 float rand_double(double lo, double hi)
 {
   return lo + ((double)rand() / (double)RAND_MAX) * (hi - lo);
@@ -309,9 +310,7 @@ void bullets_add(SHIP* ship)
   for (int i = 0; i < BULLETS_COUNT; i++)
   {
     if (bullets[i].used == true)
-    {
       continue;
-    }
 
     bullets[i].used = true;
     bullets[i].timer = 0.0;
@@ -357,9 +356,7 @@ bool bullet_collision(double x, double y)
   for (int i = 0; i < BULLETS_COUNT; i++)
   {
     if (bullets[i].used == false)
-    {
       continue;
-    }
 
     if (circular_collision(bullets[i].x, bullets[i].y, x, y))
       return true;
@@ -371,12 +368,8 @@ bool bullet_collision(double x, double y)
 bool charge_collision(double x, double y)
 {
   if (charge.state == 0 && charge.timer > 3.0)
-  {
-    if(circular_collision(charge.x, charge.y, x, y)) //Within boundaries
-    {
+    if(circular_collision(charge.x, charge.y, x, y)) // Within boundaries
       return true;
-    }
-  }
 
   return false;
 }
@@ -434,13 +427,9 @@ bool within_cell(double x, double y, NAC_BOARD* board, int mark)
 
         // Set new active grid
         if (board->marks >= 9)
-        {
           active_grid = NULL;
-        }
         else
-        {
           active_grid = &nac_boards[k][l];
-        }
 
         check_nac_board(board, mark);
 
@@ -460,9 +449,7 @@ void check_nac_board(NAC_BOARD* board, int mark)
     for (int l = 0; l <= 2; l++)
     {
       if(board->cells[k][l].state == mark)
-      {
         adj_count++;
-      }
     }
 
     if (adj_count == 3)
@@ -570,10 +557,8 @@ void input_update()
     }
 
     if (key[ALLEGRO_KEY_Z])
-    {
       if (charge.state == 1)
         charge_set(&ships[0]);
-    }
   }
 
   if (ships[1].lockout_time <= 0.0)
@@ -641,9 +626,7 @@ void ship_update(SHIP* ship)
 
     // Check if ship has picked up the charge
     if (charge_collision(ship->x, ship->y))
-    {
       charge.state = ship->id;
-    }
   }
 
   ship->x += ship->dx ; ship->y += ship->dy;
@@ -685,9 +668,7 @@ void bullets_update()
   for (int i = 0; i < BULLETS_COUNT; i++)
   {
     if (bullets[i].used == false)
-    {
       continue;
-    }
 
     bullets[i].x += bullets[i].dx; bullets[i].y += bullets[i].dy;
 
@@ -754,9 +735,8 @@ void charge_update()
   if (charge.dx == 0 && charge.dy == 0 && charge.last_touch != 0)
   {
     if(within_nac_board(charge.x, charge.y, charge.last_touch))
-    {
         charge_init();
-    }
+
     charge.last_touch = 0;
   }
 
@@ -787,12 +767,11 @@ void asteroids_update()
     if (asteroids[i].y >= BORDER_LENGTH + BORDER_PADDING)
       asteroids[i].y =  BORDER_PADDING + 1;
 
+    // Checks for other asteroids or bullet collision.
+    // May be used in the future
     if (bullet_collision(asteroids[i].x, asteroids[i].y) ||
         asteroid_collision(asteroids[i].x, asteroids[i].y))
-    {
       ;
-    }
-
 
     for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
     {
@@ -889,13 +868,9 @@ void nac_boards_draw()
 
       // Drawing the board marks
       if (nac_boards[i][j].winner == 1)
-      {
         o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0, true);
-      }
       else if (nac_boards[i][j].winner == 2)
-      {
         x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0, true);
-      }
 
       // Drawing the cell marks
       for (int k = 0; k < 3; k++)
@@ -979,9 +954,11 @@ void o_draw(double x_0, double y_0, bool is_big)
 
 void ship_draw()
 {
-  al_draw_prim(ships[0].transformed_v, NULL, NULL, 0, ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
+  al_draw_prim(ships[0].transformed_v, NULL, NULL, 0, 
+               ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
 
-  al_draw_prim(ships[1].transformed_v, NULL, NULL, 0, ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
+  al_draw_prim(ships[1].transformed_v, NULL, NULL, 0, 
+               ARRAY_SIZE(ship_v), ALLEGRO_PRIM_LINE_LOOP);
 }
 
 void bullets_draw()
@@ -989,28 +966,25 @@ void bullets_draw()
   for (int i = 0; i < BULLETS_COUNT; i++)
   {
     if (bullets[i].used == false)
-    {
       continue;
-    }
 
-    al_draw_prim(bullets[i].transformed_v, NULL, NULL, 0, ARRAY_SIZE(bullet_v), ALLEGRO_PRIM_LINE_LOOP);
+    al_draw_prim(bullets[i].transformed_v, NULL, NULL, 0, 
+                 ARRAY_SIZE(bullet_v), ALLEGRO_PRIM_LINE_LOOP);
   }
 }
 
 void charge_draw()
 {
   if (charge.state == 0)
-  {
-    al_draw_filled_circle(charge.x, charge.y, charge.radius, al_map_rgb_f(1, 0, 1));
-  }
+    al_draw_filled_circle(charge.x, charge.y, charge.radius, 
+                          al_map_rgb_f(1, 0, 1));
 }
 
 void asteroids_draw()
 {
   for (int i = 0; i < ASTEROIDS_COUNT; i++)
-  {
-    al_draw_prim(asteroids[i].transformed_v, NULL, NULL, 0, ASTEROID_VERTICES_COUNT, ALLEGRO_PRIM_LINE_LOOP);
-  }
+    al_draw_prim(asteroids[i].transformed_v, NULL, NULL, 0, 
+                 ASTEROID_VERTICES_COUNT, ALLEGRO_PRIM_LINE_LOOP);
 }
 
 void border_draw()
@@ -1038,7 +1012,7 @@ int main(int argc, char *argv[])
 
   must_init(al_init_image_addon(), "images");
 
-  flag_reader(argc, argv);
+  param_reader(argc, argv);
 
   display_init();
   audio_init();
