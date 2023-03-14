@@ -42,6 +42,11 @@ void flag_reader(int argc, char* argv[])
 
 void rotate2D(ALLEGRO_VERTEX* v, double r)
 {
+  if (r == 0.0)
+  {
+    return;
+  }
+
   double rot_x = v->x*cos(r) - v->y*sin(r);
   double rot_y = v->x*sin(r) + v->y*cos(r);
 
