@@ -346,8 +346,8 @@ void charge_set(SHIP* ship)
 
   charge.timer = 0.0;
 
-  charge.dx = ship->dx + 5.0*cos(ship->r);
-  charge.dy = ship->dy + 5.0*sin(ship->r);
+  charge.dx = ship->dx + 3.0*cos(ship->r);
+  charge.dy = ship->dy + 3.0*sin(ship->r);
 }
 
 
@@ -717,22 +717,22 @@ void charge_update()
   charge.y += charge.dy;
 
   if (charge.dx < 0.0)
-    charge.dx += 0.05;
+    charge.dx += fabs(charge.dx * 0.02);
   else
-    charge.dx -= 0.05;
+    charge.dx -= fabs(charge.dx * 0.02);
 
   if (charge.dy < 0.0)
-    charge.dy += 0.05;
+    charge.dy += fabs(charge.dy * 0.02);
   else
-    charge.dy -= 0.05;
+    charge.dy -= fabs(charge.dy * 0.02);
 
-  if (charge.dx <= 0.05 && charge.dx >= -0.05)
-    charge.dx = 0;
+  if (charge.dx <= 0.2 && charge.dx >= -0.2)
+    charge.dx = 0.0;
 
-  if (charge.dy <= 0.05 && charge.dy >= -0.05)
-    charge.dy = 0;
+  if (charge.dy <= 0.2 && charge.dy >= -0.2)
+    charge.dy = 0.0;
 
-  if (charge.dx == 0 && charge.dy == 0 && charge.last_touch != 0)
+  if (charge.dx == 0.0 && charge.dy == 0.0 && charge.last_touch != 0)
   {
     if(within_nac_board(charge.x, charge.y, charge.last_touch))
         charge_init();
