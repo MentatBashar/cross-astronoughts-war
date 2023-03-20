@@ -75,6 +75,19 @@ bool circular_collision(double x_0, double y_0, double x_1, double y_1)
   return false;
 }
 
+void screen_wrap(double* x, double* y)
+{
+  if (*x <= BORDER_PADDING)
+    *x =  BORDER_LENGTH + BORDER_PADDING - 1;
+  if (*x >= BORDER_LENGTH + BORDER_PADDING)
+    *x =  BORDER_PADDING + 1;
+
+  if (*y <= BORDER_PADDING)
+    *y =  BORDER_LENGTH + BORDER_PADDING - 1;
+  if (*y >= BORDER_LENGTH + BORDER_PADDING)
+    *y =  BORDER_PADDING + 1;
+}
+
 void must_init(bool test, const char *description)
 {
   if(test) return;
@@ -637,17 +650,7 @@ void ship_update(SHIP* ship)
   else if(ship->r > 2*ALLEGRO_PI)
     ship->r = 0 + (ship->r - 2*ALLEGRO_PI);
 
-  // Horizontal screen wrap
-  if (ship->x <= BORDER_PADDING)
-    ship->x =  BORDER_LENGTH + BORDER_PADDING - 1;
-  if (ship->x >= BORDER_LENGTH + BORDER_PADDING)
-    ship->x =  BORDER_PADDING + 1;
-
-  // Vertical screen wrap
-  if (ship->y <= BORDER_PADDING)
-    ship->y =  BORDER_LENGTH + BORDER_PADDING - 1;
-  if (ship->y >= BORDER_LENGTH + BORDER_PADDING)
-    ship->y =  BORDER_PADDING + 1;
+  screen_wrap(&ship->x, &ship->y);
 
   ship->fire_delay -= 0.1;
 
@@ -672,15 +675,7 @@ void bullets_update()
 
     bullets[i].x += bullets[i].dx; bullets[i].y += bullets[i].dy;
 
-    if (bullets[i].x <= BORDER_PADDING)
-      bullets[i].x =  BORDER_LENGTH + BORDER_PADDING - 1;
-    if (bullets[i].x >= BORDER_LENGTH + BORDER_PADDING)
-      bullets[i].x =  BORDER_PADDING + 1;
-
-    if (bullets[i].y <= BORDER_PADDING)
-      bullets[i].y =  BORDER_LENGTH + BORDER_PADDING - 1;
-    if (bullets[i].y >= BORDER_LENGTH + BORDER_PADDING)
-      bullets[i].y =  BORDER_PADDING + 1;
+    screen_wrap(&bullets[i].x, &bullets[i].y);
 
     bullets[i].timer += 0.1;
 
@@ -740,15 +735,7 @@ void charge_update()
     charge.last_touch = 0;
   }
 
-  if (charge.x <= BORDER_PADDING)
-    charge.x =  BORDER_LENGTH + BORDER_PADDING - 1;
-  if (charge.x >= BORDER_LENGTH + BORDER_PADDING)
-    charge.x =  BORDER_PADDING + 1;
-
-  if (charge.y <= BORDER_PADDING)
-    charge.y =  BORDER_LENGTH + BORDER_PADDING - 1;
-  if (charge.y >= BORDER_LENGTH + BORDER_PADDING)
-    charge.y =  BORDER_PADDING + 1;
+  screen_wrap(&charge.x, &charge.y);
 }
 
 void asteroids_update()
@@ -756,16 +743,8 @@ void asteroids_update()
   for (int i = 0; i < ASTEROIDS_COUNT; i++)
   {
     asteroids[i].x += asteroids[i].dx; asteroids[i].y += asteroids[i].dy ; asteroids[i].r += asteroids[i].dr;
-
-    if (asteroids[i].x <= BORDER_PADDING)
-      asteroids[i].x =  BORDER_LENGTH + BORDER_PADDING - 1;
-    if (asteroids[i].x >= BORDER_LENGTH + BORDER_PADDING)
-      asteroids[i].x =  BORDER_PADDING + 1;
-
-    if (asteroids[i].y <= BORDER_PADDING)
-      asteroids[i].y =  BORDER_LENGTH + BORDER_PADDING - 1;
-    if (asteroids[i].y >= BORDER_LENGTH + BORDER_PADDING)
-      asteroids[i].y =  BORDER_PADDING + 1;
+  
+    screen_wrap(&asteroids[i].x, &asteroids[i].y);
 
     // Checks for other asteroids or bullet collision.
     // May be used in the future

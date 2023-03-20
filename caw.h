@@ -161,6 +161,7 @@ void rotate2D(ALLEGRO_VERTEX* v, double r);
 int rand_int(int lo, int hi);
 float rand_double(double lo, double hi);
 bool circular_collision(double x_0, double y_0, double x_1, double y_1);
+void screen_wrap(double* x, double* y);
 
 // INIT FUNCTIONS
 void must_init(bool test, const char *description);
