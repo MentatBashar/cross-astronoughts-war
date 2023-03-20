@@ -46,8 +46,8 @@ void rotate2D(ALLEGRO_VERTEX* v, double r)
   if (r == 0.0)
     return;
 
-  double rot_x = v->x*cos(r) - v->y*sin(r);
-  double rot_y = v->x*sin(r) + v->y*cos(r);
+  double rot_x = v->x*cos(r) - v->y*sin(r),
+         rot_y = v->x*sin(r) + v->y*cos(r);
 
   v->x = rot_x ; v->y = rot_y;
 }
@@ -70,7 +70,7 @@ bool circular_collision(double x_0, double y_0, double x_1, double y_1)
   if (x_0 == x_1 && y_0 == y_1)
     return false;
   // Circular distance with Pythagoras
-  if ( sqrt(pow((x_0 - x_1), 2) + pow((y_0 - y_1), 2)) <= 7.0)
+  if (sqrt(pow((x_0 - x_1), 2) + pow((y_0 - y_1), 2)) <= 7.0)
     return true;
   return false;
 }
@@ -245,8 +245,8 @@ void asteroids_init()
     asteroids[i].dy = rand_double(-1.0, 1.0);
     asteroids[i].dr = rand_double(-0.1, 0.1);
 
-    double x_weighting = 0;
-    double y_weighting = 0;
+    double x_weighting = 0,
+           y_weighting = 0;
 
     // Creating the asteroid's unique vertex array
     for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
@@ -261,8 +261,8 @@ void asteroids_init()
       x_weighting += asteroids[i].template_v[j].x;
       y_weighting += asteroids[i].template_v[j].y;
 
-      double final_x = asteroids[i].template_v[j].x + asteroids[i].x;
-      double final_y = asteroids[i].template_v[j].y + asteroids[i].y;
+      double final_x = asteroids[i].template_v[j].x + asteroids[i].x,
+             final_y = asteroids[i].template_v[j].y + asteroids[i].y;
 
       asteroids[i].transformed_v[j] = 
         (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0, .color = ASTEROID_COLOUR };
@@ -881,20 +881,20 @@ void nac_boards_draw()
   if (active_grid == NULL)
   {
     // Draw square around whole board
-    double x_0 = u_nac_board.x_0 - u_nac_board.padding/2;
-    double y_0 = u_nac_board.y_0 - u_nac_board.padding/2;
-    double x_1 = x_0 + u_nac_board.length + u_nac_board.padding;
-    double y_1 = y_0 + u_nac_board.length + u_nac_board.padding;
+    double x_0 = u_nac_board.x_0 - u_nac_board.padding/2,
+           y_0 = u_nac_board.y_0 - u_nac_board.padding/2,
+           x_1 = x_0 + u_nac_board.length + u_nac_board.padding,
+           y_1 = y_0 + u_nac_board.length + u_nac_board.padding;
 
     al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
   }
   else
   {
     // Draw square around selected nac grid
-    double x_0 = active_grid->x_0 + u_nac_board.padding/2; 
-    double y_0 = active_grid->y_0 + u_nac_board.padding/2;
-    double x_1 = x_0 + active_grid->length + u_nac_board.padding;
-    double y_1 = y_0 + active_grid->length + u_nac_board.padding;
+    double x_0 = active_grid->x_0 + u_nac_board.padding/2,
+           y_0 = active_grid->y_0 + u_nac_board.padding/2,
+           x_1 = x_0 + active_grid->length + u_nac_board.padding,
+           y_1 = y_0 + active_grid->length + u_nac_board.padding;
 
     al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
   }
@@ -905,8 +905,8 @@ void x_draw(double x_0, double y_0, bool is_big)
   x_0 += 10 + (2 * is_big);
   y_0 += 10 + (2 * is_big);
 
-  double x_1 = x_0 + 20 + (4 * is_big);
-  double y_1 = y_0 + 20 + (4 * is_big);
+  double x_1 = x_0 + 20 + (4 * is_big),
+         y_1 = y_0 + 20 + (4 * is_big);
 
   double w = 1 + (1.5 * is_big);
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), w);
@@ -968,8 +968,10 @@ void asteroids_draw()
 
 void border_draw()
 {
-  double x_0 = BORDER_PADDING                 , y_0 = BORDER_PADDING;
-  double x_1 = BORDER_LENGTH + BORDER_PADDING	, y_1 = BORDER_LENGTH + BORDER_PADDING;
+  double x_0 = BORDER_PADDING,
+         y_0 = BORDER_PADDING;
+  double x_1 = BORDER_LENGTH + BORDER_PADDING,
+         y_1 = BORDER_LENGTH + BORDER_PADDING;
 
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
 }
