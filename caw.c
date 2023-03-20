@@ -269,7 +269,7 @@ void nac_boards_init()
   u_nac_board.y_0 = 160;
   u_nac_board.length = 480;
   u_nac_board.winner = 0;
-  u_nac_board.padding = 20;
+  u_nac_board.padding = 20.0;
 
   active_grid = NULL;
 
@@ -281,7 +281,7 @@ void nac_boards_init()
       nac_boards[i][j].winner = 0;
       nac_boards[i][j].x_0 = u_nac_board.x_0 + (nac_boards[i][j].length + 2*u_nac_board.padding) * i;
       nac_boards[i][j].y_0 = u_nac_board.y_0 + (nac_boards[i][j].length + 2*u_nac_board.padding) * j;
-      nac_boards[i][j].padding = 20;
+      nac_boards[i][j].padding = 20.0;
       for (int k = 0; k < 3; k++)
       {
         for (int l = 0; l < 3; l++)
