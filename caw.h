@@ -67,7 +67,7 @@ const int BORDER_LENGTH  = 750;
 const int BORDER_PADDING =  25;
 
 // TEMP LOC FOR ENUMS AND TEST THINGS
-ALLEGRO_BITMAP* josh;
+ALLEGRO_BITMAP* main_menu;
 typedef enum { MAIN_MENU, GAME } SCREEN;
 SCREEN current_screen = 0;
 

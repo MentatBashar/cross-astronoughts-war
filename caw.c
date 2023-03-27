@@ -154,8 +154,8 @@ void keyboard_init()
 
 void main_menu_init()
 {
-  josh = al_load_bitmap("josh.png");
-  must_init(josh, "josh");
+  main_menu = al_load_bitmap("images\\main_menu.png");
+  must_init(main_menu, "main_menu");
 }
 
 void game_init()
@@ -772,7 +772,7 @@ bool game_end_update()
 
 void main_menu_draw()
 {
-  al_draw_bitmap(josh, 0, 0, 0);
+  al_draw_bitmap(main_menu, 0, 0, 0);
 }
 
 
