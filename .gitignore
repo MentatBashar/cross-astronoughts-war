@@ -1,6 +1,9 @@
 # MacOS Files
 *.DS_Store
 
+# Visual Studio Code files
+*.vscode
+
 #Swap Files
 *.swp
 
