@@ -156,6 +156,26 @@ void main_menu_init()
 {
   main_menu = al_load_bitmap("images\\main_menu.png");
   must_init(main_menu, "main_menu");
+  for(int i = 0; i < 6; i++) {
+    menu_asteroid_init(&menu_asteroids[i]);
+  }
+}
+
+void menu_asteroid_init(MENU_ASTEROID* menu_asteroid)
+{
+  //Set the start position
+  menu_asteroid->x = 400 + pow(rand_double(-100, -300), rand_int(1, 3));
+  menu_asteroid->y = rand_double(300, 500);
+  //Set bitmap scale and rate of change for scale
+  menu_asteroid->scale = 0.1;
+  menu_asteroid->dscale = rand_double(0.01, 0.1);
+  //Rotation remains constant for one pass
+  menu_asteroid->rotation = rand_double(0, 360);
+  //Timer controls framerate, frame controls which png is displayed
+  menu_asteroid->timer = 0;
+  menu_asteroid->frame = 0;
+  menu_asteroid->image = al_load_bitmap("images\\rock_frames\\R0.png");
+  must_init(menu_asteroid->image, "asteroid");
 }
 
 void game_init()
@@ -527,9 +547,96 @@ void keyboard_update(ALLEGRO_EVENT* event)
 
 void main_menu_update()
 {
+  //Asteroids
+  for(int i = 0; i < 6; i++)
+  {
+    menu_asteroid_update(&menu_asteroids[i]);
+  }
+  //Exit
   if (key[ALLEGRO_KEY_ENTER])
   {
     current_screen = GAME;
+  }
+}
+
+void menu_asteroid_update(MENU_ASTEROID* menu_asteroid) {
+  //Change the position
+  menu_asteroid->x += menu_asteroid->dx;
+  menu_asteroid->y += menu_asteroid->dy;
+  //Change the amount that the next tick changes the position
+  menu_asteroid->dx = ((menu_asteroid->x - 400) / 30) * menu_asteroid->scale;
+  menu_asteroid->dy = ((menu_asteroid->y - 400) / 20) * menu_asteroid->scale;
+  
+  //Timer and boolean value used to control frame switching of the rocks
+  menu_asteroid->timer += 1;
+  bool change_frame = false;
+
+  //if new frame, reset timer
+  if(menu_asteroid->timer == 10)
+  {
+    menu_asteroid->timer = 0;
+    menu_asteroid->frame++;
+    change_frame = true;
+
+    //Reset asteroid if out of bounds or too big
+    if(menu_asteroid->x < -50 || menu_asteroid->x > 850 ||
+      menu_asteroid->y < -50 || menu_asteroid->y > 850 ||
+      menu_asteroid->scale > 1.2)
+    {
+      menu_asteroid_init(menu_asteroid);
+    }
+    //If in bounds, make bigger and make more bigger next time
+    else
+    {
+      menu_asteroid->scale += menu_asteroid->dscale;
+      menu_asteroid->dscale += menu_asteroid->scale / 30;
+    }
+  }
+
+  //Loop frames
+  if(menu_asteroid->frame == 9)
+  {
+    menu_asteroid->frame = 0;
+  }
+
+  //Switch frames
+  if(change_frame)
+  {
+    char path[] = "images\\rock_frames\\";
+    char new_path[26];
+    strcpy(new_path, path);
+    switch (menu_asteroid->frame)
+    {
+      case 0:
+        strcat(new_path, "R0.png");
+        break;
+      case 1:
+        strcat(new_path, "R1.png");
+        break;
+      case 2:
+        strcat(new_path, "R2.png");
+        break;
+      case 3:
+        strcat(new_path, "R3.png");
+        break;
+      case 4:
+        strcat(new_path, "R4.png");
+        break;
+      case 5:
+        strcat(new_path, "R5.png");
+        break;
+      case 6:
+        strcat(new_path, "R6.png");
+        break;
+      case 7:
+        strcat(new_path, "R7.png");
+        break;
+      case 8:
+        strcat(new_path, "R8.png");
+        break;
+    }
+    menu_asteroid->image = al_load_bitmap(new_path);
+    change_frame = false;
   }
 }
 
@@ -773,6 +880,16 @@ bool game_end_update()
 void main_menu_draw()
 {
   al_draw_bitmap(main_menu, 0, 0, 0);
+  for(int i = 0; i < 6; i++)
+  {
+    menu_asteroid_draw(&menu_asteroids[i]);
+  }
+}
+
+void menu_asteroid_draw(MENU_ASTEROID* menu_asteroid)
+{
+  int c = 150 * menu_asteroid->scale;
+  al_draw_tinted_scaled_rotated_bitmap(menu_asteroid->image, al_map_rgb(c, c, c), 50, 50, menu_asteroid->x, menu_asteroid->y, menu_asteroid->scale, menu_asteroid->scale, menu_asteroid->rotation, 0);
 }
 
 

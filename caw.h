@@ -66,10 +66,20 @@ int DEBUG_NO_ASTEROID_COLLISION = 1;
 const int BORDER_LENGTH  = 750;
 const int BORDER_PADDING =  25;
 
-// TEMP LOC FOR ENUMS AND TEST THINGS
+// MENU VARIABLES
 ALLEGRO_BITMAP* main_menu;
 typedef enum { MAIN_MENU, GAME } SCREEN;
 SCREEN current_screen = 0;
+
+typedef struct MENU_ASTEROID
+{
+  ALLEGRO_BITMAP* image;
+  int timer;
+  int frame;
+  double x, y, dx, dy, scale, dscale, rotation;
+} MENU_ASTEROID;
+MENU_ASTEROID menu_asteroids[6];
+
 
 // STRUCTS
 typedef struct SHIP
@@ -178,6 +188,7 @@ void keyboard_init();
 
 // Main menu inits
 void main_menu_init();
+void menu_asteroid_init(MENU_ASTEROID* menu_asteroid);
 
 // Game inits
 void game_init();
@@ -202,6 +213,7 @@ void check_nac_board(NAC_BOARD* board, int mark);
 void keyboard_update(ALLEGRO_EVENT* event);
 
 void main_menu_update();
+void menu_asteroid_update(MENU_ASTEROID* menu_asteroid);
 
 void game_update();
 
@@ -213,6 +225,7 @@ void asteroids_update();
 bool game_end_update();
 
 void main_menu_draw();
+void menu_asteroid_draw(MENU_ASTEROID* menu_asteroid);
 
 void game_draw();
 
