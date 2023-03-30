@@ -381,7 +381,7 @@ bool asteroid_collision(double x, double y)
   return false;
 }
 
-bool within_nac_board(double x, double y, int mark)
+bool within_cell(double x, double y, int mark)
 {
     for (int i = 2; i >= 0; i--)
     {
@@ -391,47 +391,31 @@ bool within_nac_board(double x, double y, int mark)
                 x < nac_boards[i][j].x_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
                 y > nac_boards[i][j].y_0 &&
                 y < nac_boards[i][j].y_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
-                nac_boards[i][j].winner == 0 &&
-                (&nac_boards[i][j] == active_grid || active_grid == NULL))
+                nac_boards[i][j].winner == 0) //(&nac_boards[i][j] == active_grid || active_grid == NULL)
             {
-              return within_cell(x, y, i, j, mark);
-            }
-        }
-    }
-    return false;
-}
+              if(active_grid == NULL)
+              {
+                active_grid = &nac_boards[i][j];
+              }
+              else if (active_grid->cells[i][j].state == 0)
+              {
+                //Set cell's mark to be charge's last owner
+                active_grid->cells[i][j].state = mark;
+                active_grid->marks++;
 
-bool within_cell(double x, double y, int i, int j, int mark)
-{
-    for (int k = 2; k >= 0; k--)
-    {
-        for (int l = 2; l >= 0; l--)
-        {
-            if (x > nac_boards[i][j].cells[k][l].x_0 &&
-                x < nac_boards[i][j].cells[k][l].x_0 + nac_boards[i][j].cells[k][l].length &&
-                y > nac_boards[i][j].cells[k][l].y_0 &&
-                y < nac_boards[i][j].cells[k][l].y_0 + nac_boards[i][j].cells[k][l].length)
-            {
-                if (nac_boards[i][j].cells[k][l].state == 0)
+                //Set new active grid
+                if (nac_boards[i][j].marks >= 9)
                 {
-                    // Set cell's mark to be charge's last owner
-                    nac_boards[i][j].cells[k][l].state = mark;
-
-                    nac_boards[i][j].marks++;
-
-                    // Set new active grid
-                    if (nac_boards[k][l].marks >= 9)
-                    {
-                      active_grid = NULL;
-                    }
-                    else
-                    {
-                      active_grid = &nac_boards[k][l];
-                    }
-
-                    check_nac_board(i, j, mark);
-                    return true;
+                  active_grid = NULL;
                 }
+                else
+                {
+                  active_grid = &nac_boards[i][j];
+                }
+
+                check_nac_board(i, j, mark);
+              }
+              return true;
             }
         }
     }
@@ -713,9 +697,9 @@ void charge_update()
 
   if (charge.dx == 0 && charge.dy == 0 && charge.last_touch != 0)
   {
-    if(within_nac_board(charge.x, charge.y, charge.last_touch))
+    if(within_cell(charge.x, charge.y, charge.last_touch))
     {
-        charge_init();
+      charge_init();
     }
     charge.last_touch = 0;
   }
@@ -798,37 +782,6 @@ void nac_boards_draw()
       u_nac_board.y_0 + 2*u_nac_board.length/3,
       U_NAC_BOARD_COLOUR, 1);
 
-  // Draw nac_boards
-  for (int i = 0; i < 3; i++)
-  {
-    for (int j = 0; j < 3; j++)
-    {
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding,
-          nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
-          NAC_BOARD_COLOUR, 1);
-
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding,
-          nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
-          NAC_BOARD_COLOUR, 1);
-
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
-          nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
-          NAC_BOARD_COLOUR, 1);
-
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
-          nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
-          nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
-          nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
-          NAC_BOARD_COLOUR, 1);
-    }
-  }
-
   // Draw square around active grid
   if (active_grid == NULL)
   {
@@ -854,18 +807,6 @@ void nac_boards_draw()
 
 void x_draw(double x_0, double y_0)
 {
-  x_0 += 10;
-  y_0 += 10;
-  double x_1 = x_0 + 20;
-  double y_1 = y_0 + 20;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
-
-  x_0 += 20;
-  x_1 -= 20;
-  al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), 1);
-}
-void big_x_draw(double x_0, double y_0)
-{
   x_0 += 10 * 3;
   y_0 += 10 * 3;
   double x_1 = x_0 + 20 * 5;
@@ -879,15 +820,6 @@ void big_x_draw(double x_0, double y_0)
 
 void o_draw(double x_0, double y_0)
 {
-  x_0 += 10;
-  y_0 += 10;
-  double r = 10;
-  x_0 += r;
-  y_0 += r;
-  al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 1);
-}
-void big_o_draw(double x_0, double y_0)
-{
   x_0 += 10 * 3;
   y_0 += 10 * 3;
   double r = 10 * 5;
@@ -895,36 +827,52 @@ void big_o_draw(double x_0, double y_0)
   y_0 += r;
   al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), 2.5);
 }
+
 void nac_boards_mark()
 {
-    for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
     {
-        for (int j = 0; j < 3; j++)
+      if(&nac_boards[i][j] == active_grid)
+      {
+        for(int k = 0; k < 3; k++)
         {
-            if (nac_boards[i][j].winner == 1)
+          for(int l = 0; l < 3; l++)
+          {
+            if (nac_boards[i][j].cells[k][l].state == 1)
             {
-              big_o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
+              o_draw(nac_boards[i][j].x_0, nac_boards[k][l].y_0);
             }
-            else if (nac_boards[i][j].winner == 2)
+            else if (nac_boards[i][j].cells[k][l].state == 2)
             {
-              big_x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0);
+              x_draw(nac_boards[i][j].x_0, nac_boards[k][l].y_0);
             }
-            for (int k = 0; k < 3; k++)
-            {
-                for (int l = 0; l < 3; l++)
-                {
-                    if (nac_boards[i][j].cells[k][l].state == 1 && nac_boards[i][j].winner == 0)
-                    {
-                        o_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
-                    }
-                    else if (nac_boards[i][j].cells[k][l].state == 2 && nac_boards[i][j].winner == 0)
-                    {
-                        x_draw(nac_boards[i][j].cells[k][l].x_0, nac_boards[i][j].cells[k][l].y_0);
-                    }
-                }
-            }
+          }
         }
+      }
+      else
+      {
+        for (int k = 0; k < 3; k++)
+        {
+          for (int l = 0; l < 3; l++)
+          {
+            if (nac_boards[i][j].cells[k][l].state == 1 && nac_boards[i][j].winner == 0)
+            {
+              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(0, 0, 255), 1);
+            }
+            else if (nac_boards[i][j].cells[k][l].state == 2 && nac_boards[i][j].winner == 0)
+            {
+              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(255, 0, 0), 1);
+            }
+            else {
+              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(0, 255, 0), 1);
+            }
+          }
+        }
+      }
     }
+  }
 }
 
 void ship_draw()
