@@ -415,6 +415,9 @@ bool within_cell(double x, double y, int mark)
 
                 check_nac_board(i, j, mark);
               }
+              else {
+                return false;
+              }
               return true;
             }
         }
@@ -836,17 +839,19 @@ void nac_boards_mark()
     {
       if(&nac_boards[i][j] == active_grid)
       {
+        printf("%s%d%d\n", "marking board: ", i, j);
         for(int k = 0; k < 3; k++)
         {
           for(int l = 0; l < 3; l++)
           {
             if (nac_boards[i][j].cells[k][l].state == 1)
             {
-              o_draw(nac_boards[i][j].x_0, nac_boards[k][l].y_0);
+              printf("%s%d%d\n", "Mark in cell: ", k, l);
+              o_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0);
             }
             else if (nac_boards[i][j].cells[k][l].state == 2)
             {
-              x_draw(nac_boards[i][j].x_0, nac_boards[k][l].y_0);
+              x_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0);
             }
           }
         }
@@ -857,11 +862,11 @@ void nac_boards_mark()
         {
           for (int l = 0; l < 3; l++)
           {
-            if (nac_boards[i][j].cells[k][l].state == 1 && nac_boards[i][j].winner == 0)
+            if (nac_boards[i][j].cells[k][l].state == 1)
             {
               al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(0, 0, 255), 1);
             }
-            else if (nac_boards[i][j].cells[k][l].state == 2 && nac_boards[i][j].winner == 0)
+            else if (nac_boards[i][j].cells[k][l].state == 2)
             {
               al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(255, 0, 0), 1);
             }
