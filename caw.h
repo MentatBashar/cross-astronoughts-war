@@ -72,6 +72,11 @@ typedef enum { MAIN_MENU, GAME } SCREEN;
 SCREEN current_screen = 0;
 
 // STRUCTS
+typedef struct TRANSFORM
+{
+  double x, y, r, dx, dy, dr;
+} TRANSFORM;
+
 typedef struct SHIP
 {
   double x, y, r, dx, dy, dr;
@@ -155,8 +160,10 @@ CELL cells[3][3];
 
 void param_reader(int argc, char* argv[]);
 
-// 2D Rotation Helper Function
+// 2D Rotation Helper Functions
 void rotate2D(ALLEGRO_VERTEX* v, double r);
+void move_transform(ALLEGRO_VERTEX* v, ALLEGRO_VERTEX* t_v, int size,
+                    double x, double y, double r);
 
 int rand_int(int lo, int hi);
 float rand_double(double lo, double hi);

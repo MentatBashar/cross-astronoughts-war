@@ -52,6 +52,20 @@ void rotate2D(ALLEGRO_VERTEX* v, double r)
   v->x = rot_x ; v->y = rot_y;
 }
 
+void move_transform(ALLEGRO_VERTEX* v, ALLEGRO_VERTEX* t_v,
+                    int size, double x, double y, double r)
+{
+  for (int i = 0; i < size; i++)
+  {
+    t_v[i].x = v[i].x;
+    t_v[i].y = v[i].y;
+
+    rotate2D(&t_v[i], r);
+
+    t_v[i].x += x ; t_v[i].y += y;
+  }
+}
+
 // lo <= x < hi
 int rand_int(int lo, int hi)
 {
@@ -654,16 +668,9 @@ void ship_update(SHIP* ship)
 
   ship->fire_delay -= 0.1;
 
-  // Move ship's transform
-  for (int i = 0; i < ARRAY_SIZE(ship_v); i++)
-  {
-    ship->transformed_v[i].x = ship_v[i].x;
-    ship->transformed_v[i].y = ship_v[i].y;
-
-    rotate2D(&ship->transformed_v[i], ship->r);
-
-    ship->transformed_v[i].x += ship->x ; ship->transformed_v[i].y += ship->y;
-  }
+  move_transform(ship_v, ship->transformed_v,
+                 ARRAY_SIZE(ship_v),
+                 ship->x, ship->y, ship->r);
 }
 
 void bullets_update()
@@ -692,16 +699,9 @@ void bullets_update()
       continue;
     }
 
-
-    for (int j = 0; j < ARRAY_SIZE(bullet_v); j++)
-    {
-      bullets[i].transformed_v[j].x = bullet_v[j].x;
-      bullets[i].transformed_v[j].y = bullet_v[j].y;
-
-      rotate2D(&bullets[i].transformed_v[j], bullets[i].r);
-
-      bullets[i].transformed_v[j].x += bullets[i].x ; bullets[i].transformed_v[j].y += bullets[i].y;
-    }
+    move_transform(bullet_v, bullets[i].transformed_v,
+                   ARRAY_SIZE(bullet_v),
+                   bullets[i].x, bullets[i].y, bullets[i].r);
   }
 }
 
@@ -752,15 +752,9 @@ void asteroids_update()
         asteroid_collision(asteroids[i].x, asteroids[i].y))
       ;
 
-    for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
-    {
-      asteroids[i].transformed_v[j].x = asteroids[i].template_v[j].x;
-      asteroids[i].transformed_v[j].y = asteroids[i].template_v[j].y;
-
-      rotate2D(&asteroids[i].transformed_v[j], asteroids[i].r);
-
-      asteroids[i].transformed_v[j].x += asteroids[i].x ; asteroids[i].transformed_v[j].y += asteroids[i].y;
-    }
+    move_transform(asteroids[i].template_v, asteroids[i].transformed_v,
+                   ARRAY_SIZE(asteroids[i].template_v),
+                   asteroids[i].x, asteroids[i].y, asteroids[i].r);
   }
 }
 
@@ -969,8 +963,8 @@ void asteroids_draw()
 void border_draw()
 {
   double x_0 = BORDER_PADDING,
-         y_0 = BORDER_PADDING;
-  double x_1 = BORDER_LENGTH + BORDER_PADDING,
+         y_0 = BORDER_PADDING,
+         x_1 = BORDER_LENGTH + BORDER_PADDING,
          y_1 = BORDER_LENGTH + BORDER_PADDING;
 
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
