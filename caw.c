@@ -104,7 +104,8 @@ void screen_wrap(double* x, double* y)
 
 void must_init(bool test, const char *description)
 {
-  if(test) return;
+  if(test)
+    return;
 
   printf("Couldn't initialise %s\n", description);
   exit(1);
@@ -542,9 +543,7 @@ void keyboard_update(ALLEGRO_EVENT* event)
 void main_menu_update()
 {
   if (key[ALLEGRO_KEY_ENTER])
-  {
     current_screen = GAME;
-  }
 }
 
 
