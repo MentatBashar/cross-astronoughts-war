@@ -47,16 +47,26 @@ ALLEGRO_VERTEX ship_v[4];
 ALLEGRO_VERTEX bullet_v[4];
 
 // COLOUR VARIABLES
-ALLEGRO_COLOR ERROR_COLOUR = { .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
+ALLEGRO_COLOR ERROR_COLOUR =
+{ .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 
-ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR = { .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0};
+ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR =
+{ .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0 };
 
-ALLEGRO_COLOR U_NAC_BOARD_COLOUR = { .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0};
-ALLEGRO_COLOR NAC_BOARD_COLOUR = { .r = 0.7, .g = 0.7, .b = 0.7, .a = 1.0};
+ALLEGRO_COLOR U_NAC_BOARD_COLOUR =
+{ .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0 };
 
-ALLEGRO_COLOR P1_COLOUR = { .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
-ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
-ALLEGRO_COLOR ASTEROID_COLOUR = { .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
+ALLEGRO_COLOR NAC_BOARD_COLOUR =
+{ .r = 0.7, .g = 0.7, .b = 0.7, .a = 1.0 };
+
+ALLEGRO_COLOR P1_COLOUR =
+{ .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
+
+ALLEGRO_COLOR P2_COLOUR =
+{ .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
+
+ALLEGRO_COLOR ASTEROID_COLOUR =
+{ .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
 
 // DEBUG VARIABLES
 int DEBUG_VIEW_COLLIDERS = 0;
