@@ -1,4 +1,4 @@
-/*
+/**
 
                   _______  ______  _____  _______ _______
                   |       |_____/ |     | |______ |______
@@ -9,11 +9,19 @@
             __   _  _____  _     _  ______ _     _ _______ _______
             | \  | |     | |     | |  ____ |_____|    |    |______
             |  \_| |_____| |_____| |_____| |     |    |    ______|
-                           _  _  _ _______  ______
-                           |  |  | |_____| |_____/
-                           |__|__| |     | |    \_
+                          _  _  _ _______  ______
+                          |  |  | |_____| |_____/
+                          |__|__| |     | |    \_
+
+  A game made with the Allegro game programming library. Based on a previous
+  undistributed game, but with an added layer of Ultimate Noughts & Crosses.
+
+  Currently unfinished at the time of writing.
+
+  Made by MentatBashar and Aion152, 2023
 
 */
+
 
 #include "caw.h"
 
