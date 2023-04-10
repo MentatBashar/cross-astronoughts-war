@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <allegro5/allegro5.h>
-#include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -38,9 +37,6 @@ unsigned char key[ALLEGRO_KEY_MAX];
 
 // SAMPLES
 ALLEGRO_SAMPLE* sample_fire;
-
-// FONTS
-ALLEGRO_FONT* font;
 
 // ENTITY TEMPLATE TRANSFORMS
 ALLEGRO_VERTEX ship_v[4];
