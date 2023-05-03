@@ -201,7 +201,7 @@ void menu_asteroid_init(MENU_ASTEROID* menu_asteroid)
   //Timer controls framerate, frame controls which png is displayed
   menu_asteroid->timer = 0;
   menu_asteroid->frame = 0;
-  menu_asteroid->image = al_load_bitmap("images/rock_frames/R0.png");
+  menu_asteroid->image = al_load_bitmap("images\\rock_frames\\R0.png");
   must_init(menu_asteroid->image, "asteroid");
 }
 
@@ -679,7 +679,7 @@ void menu_asteroid_update(MENU_ASTEROID* menu_asteroid) {
   //Switch frames
   if(change_frame)
   {
-    char path[] = "images/rock_frames/";
+    char path[] = "images\\rock_frames\\";
     char new_path[26];
     strcpy(new_path, path);
     switch (menu_asteroid->frame)
