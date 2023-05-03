@@ -839,7 +839,6 @@ void nac_boards_mark()
     {
       if(&nac_boards[i][j] == active_grid)
       {
-        printf("%s%d%d\n", "marking board: ", i, j);
         for(int k = 0; k < 3; k++)
         {
           for(int l = 0; l < 3; l++)
