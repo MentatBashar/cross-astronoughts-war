@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <allegro5/allegro5.h>
-#include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -39,24 +38,31 @@ unsigned char key[ALLEGRO_KEY_MAX];
 // SAMPLES
 ALLEGRO_SAMPLE* sample_fire;
 
-// FONTS
-ALLEGRO_FONT* font;
-
 // ENTITY TEMPLATE TRANSFORMS
 ALLEGRO_VERTEX ship_v[4];
 ALLEGRO_VERTEX bullet_v[4];
 
 // COLOUR VARIABLES
-ALLEGRO_COLOR ERROR_COLOUR = { .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
+ALLEGRO_COLOR ERROR_COLOUR =
+{ .r = 1.0, .g = 0.0, .b = 1.0, .a = 1.0 };
 
-ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR = { .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0};
+ALLEGRO_COLOR DEBUG_COLLIDER_COLOUR =
+{ .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0 };
 
-ALLEGRO_COLOR U_NAC_BOARD_COLOUR = { .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0};
-ALLEGRO_COLOR NAC_BOARD_COLOUR = { .r = 0.7, .g = 0.7, .b = 0.7, .a = 1.0};
+ALLEGRO_COLOR U_NAC_BOARD_COLOUR =
+{ .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0 };
 
-ALLEGRO_COLOR P1_COLOUR = { .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
-ALLEGRO_COLOR P2_COLOUR = { .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
-ALLEGRO_COLOR ASTEROID_COLOUR = { .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
+ALLEGRO_COLOR NAC_BOARD_COLOUR =
+{ .r = 0.7, .g = 0.7, .b = 0.7, .a = 1.0 };
+
+ALLEGRO_COLOR P1_COLOUR =
+{ .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 };
+
+ALLEGRO_COLOR P2_COLOUR =
+{ .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 };
+
+ALLEGRO_COLOR ASTEROID_COLOUR =
+{ .r = 0.3, .g = 0.3, .b = 0.3, .a = 1.0 };
 
 // DEBUG VARIABLES
 int DEBUG_VIEW_COLLIDERS = 0;
@@ -82,6 +88,11 @@ MENU_ASTEROID menu_asteroids[6];
 
 
 // STRUCTS
+typedef struct TRANSFORM
+{
+  double x, y, r, dx, dy, dr;
+} TRANSFORM;
+
 typedef struct SHIP
 {
   double x, y, r, dx, dy, dr;
@@ -165,8 +176,10 @@ CELL cells[3][3];
 
 void param_reader(int argc, char* argv[]);
 
-// 2D Rotation Helper Function
+// 2D Rotation Helper Functions
 void rotate2D(ALLEGRO_VERTEX* v, double r);
+void move_transform(ALLEGRO_VERTEX* v, ALLEGRO_VERTEX* t_v, int size,
+                    double x, double y, double r);
 
 int rand_int(int lo, int hi);
 float rand_double(double lo, double hi);

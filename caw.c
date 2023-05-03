@@ -1,16 +1,27 @@
-/*
+/**
 
-                           _______  ______  _____  _______ _______
-                           |       |_____/ |     | |______ |______
-                           |_____  |    \_ |_____| ______| ______|
- _______ _______ _______  ______  _____  __   _  _____  _     _  ______ _     _ _______ _______
- |_____| |______    |    |_____/ |     | | \  | |     | |     | |  ____ |_____|    |    |______
- |     | ______|    |    |    \_ |_____| |  \_| |_____| |_____| |_____| |     |    |    ______|
-                                   _  _  _ _______  ______
-                                   |  |  | |_____| |_____/
-                                   |__|__| |     | |    \_
+                  _______  ______  _____  _______ _______
+                  |       |_____/ |     | |______ |______
+                  |_____  |    \_ |_____| ______| ______|
+                  _______ _______ _______  ______  _____
+                  |_____| |______    |    |_____/ |     | ___
+                  |     | ______|    |    |    \_ |_____|
+            __   _  _____  _     _  ______ _     _ _______ _______
+            | \  | |     | |     | |  ____ |_____|    |    |______
+            |  \_| |_____| |_____| |_____| |     |    |    ______|
+                          _  _  _ _______  ______
+                          |  |  | |_____| |_____/
+                          |__|__| |     | |    \_
+
+  A game made with the Allegro game programming library. Based on a previous
+  undistributed game, but with an added layer of Ultimate Noughts & Crosses.
+
+  Currently unfinished at the time of writing.
+
+  Made by MentatBashar and Aion152, 2023
 
 */
+
 
 #include "caw.h"
 
@@ -52,6 +63,20 @@ void rotate2D(ALLEGRO_VERTEX* v, double r)
   v->x = rot_x ; v->y = rot_y;
 }
 
+void move_transform(ALLEGRO_VERTEX* v, ALLEGRO_VERTEX* t_v,
+                    int size, double x, double y, double r)
+{
+  for (int i = 0; i < size; i++)
+  {
+    t_v[i].x = v[i].x;
+    t_v[i].y = v[i].y;
+
+    rotate2D(&t_v[i], r);
+
+    t_v[i].x += x ; t_v[i].y += y;
+  }
+}
+
 // lo <= x < hi
 int rand_int(int lo, int hi)
 {
@@ -90,7 +115,8 @@ void screen_wrap(double* x, double* y)
 
 void must_init(bool test, const char *description)
 {
-  if(test) return;
+  if(test)
+    return;
 
   printf("Couldn't initialise %s\n", description);
   exit(1);
@@ -126,8 +152,9 @@ void display_pre_draw()
 void display_post_draw()
 {
   al_set_target_backbuffer(display);
-  al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, 0, 0,
-                        display_width,display_height, 0);
+  al_draw_scaled_bitmap(buffer,
+                        0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
+                        0, 0, display_width, display_height, 0);
 
   al_flip_display();
 }
@@ -189,36 +216,61 @@ void game_init()
 
 void ship_init()
 {
-  ships[0].x = 2*BORDER_PADDING ; ships[0].y = BORDER_LENGTH/2 ; ships[0].r = 0;
-  ships[0].dx = 0 ; ships[0].dy = 0;
+  ships[0].x = 2*BORDER_PADDING;
+  ships[0].y = BORDER_LENGTH/2;
+  ships[0].r = 0;
+
+  ships[0].dx = 0;
+  ships[0].dy = 0;
+
   ships[0].thrust = 0.1;
   ships[0].rot_speed = 0.1;
   ships[0].fire_delay = 0.0;
   ships[0].lockout_time = 0.0;
+
   ships[0].colour = P1_COLOUR;
   ships[0].id = 1;
 
-  ships[1].x = BORDER_LENGTH ; ships[1].y = BORDER_LENGTH/2 ; ships[1].r = ALLEGRO_PI;
-  ships[1].dx = 0 ; ships[1].dy = 0;
+
+  ships[1].x = BORDER_LENGTH;
+  ships[1].y = BORDER_LENGTH/2;
+  ships[1].r = ALLEGRO_PI;
+
+  ships[1].dx = 0;
+  ships[1].dy = 0;
+
   ships[1].thrust = 0.1;
   ships[1].rot_speed = 0.1;
   ships[1].fire_delay = 0.0;
   ships[1].lockout_time = 0.0;
+
   ships[1].colour = P2_COLOUR;
   ships[1].id = 2;
 
-  ship_v[0] = (ALLEGRO_VERTEX) { .x =  8, .y =  0, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
-  ship_v[1] = (ALLEGRO_VERTEX) { .x = -6, .y = -4, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
-  ship_v[2] = (ALLEGRO_VERTEX) { .x = -8, .y =  0, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
-  ship_v[3] = (ALLEGRO_VERTEX) { .x = -6, .y =  4, .z = 0, .color = DEBUG_COLLIDER_COLOUR };
+  ship_v[0] = (ALLEGRO_VERTEX) { .x =  8, .y =  0, .z = 0, 
+                                 .color = DEBUG_COLLIDER_COLOUR };
+  ship_v[1] = (ALLEGRO_VERTEX) { .x = -6, .y = -4, .z = 0,
+                                 .color = DEBUG_COLLIDER_COLOUR };
+  ship_v[2] = (ALLEGRO_VERTEX) { .x = -8, .y =  0, .z = 0,
+                                 .color = DEBUG_COLLIDER_COLOUR };
+  ship_v[3] = (ALLEGRO_VERTEX) { .x = -6, .y =  4, .z = 0, 
+                                 .color = DEBUG_COLLIDER_COLOUR };
 
-  memcpy(ships[0].transformed_v, ship_v, sizeof(ALLEGRO_VERTEX) * ARRAY_SIZE(ship_v));
+  memcpy(ships[0].transformed_v,
+         ship_v,
+         sizeof(ALLEGRO_VERTEX) * ARRAY_SIZE(ship_v)
+         );
+
   for (int i = 0; i < ARRAY_SIZE(ships[0].transformed_v); i++)
   {
     ships[0].transformed_v[i].color = P1_COLOUR;
   }
 
-  memcpy(ships[1].transformed_v, ship_v, sizeof(ALLEGRO_VERTEX) * ARRAY_SIZE(ship_v));
+  memcpy(ships[1].transformed_v,
+         ship_v,
+         sizeof(ALLEGRO_VERTEX) * ARRAY_SIZE(ship_v)
+         );
+
   for (int i = 0; i < ARRAY_SIZE(ships[1].transformed_v); i++)
   {
     ships[1].transformed_v[i].color = P2_COLOUR;
@@ -227,10 +279,14 @@ void ship_init()
 
 void bullets_init()
 {
-  bullet_v[0] = (ALLEGRO_VERTEX) { .x =  3, .y =  0, .z = 0, .color = ERROR_COLOUR };
-  bullet_v[1] = (ALLEGRO_VERTEX) { .x = -3, .y = -2, .z = 0, .color = ERROR_COLOUR };
-  bullet_v[2] = (ALLEGRO_VERTEX) { .x = -1, .y =  0, .z = 0, .color = ERROR_COLOUR };
-  bullet_v[3] = (ALLEGRO_VERTEX) { .x = -3, .y =  2, .z = 0, .color = ERROR_COLOUR };
+  bullet_v[0] = (ALLEGRO_VERTEX) { .x =  3, .y =  0, .z = 0,
+                                   .color = ERROR_COLOUR };
+  bullet_v[1] = (ALLEGRO_VERTEX) { .x = -3, .y = -2, .z = 0,
+                                   .color = ERROR_COLOUR };
+  bullet_v[2] = (ALLEGRO_VERTEX) { .x = -1, .y =  0, .z = 0,
+                                   .color = ERROR_COLOUR };
+  bullet_v[3] = (ALLEGRO_VERTEX) { .x = -3, .y =  2, .z = 0,
+                                   .color = ERROR_COLOUR };
 
   for (int i = 0; i < BULLETS_COUNT; i++)
   {
@@ -238,7 +294,10 @@ void bullets_init()
     bullets[i].max_time = 19.0;
     bullets[i].timer = 0.0;
 
-    memcpy(bullets[i].transformed_v, bullet_v, sizeof(ALLEGRO_VERTEX) * ARRAY_SIZE(bullet_v));
+    memcpy(bullets[i].transformed_v,
+           bullet_v,
+           sizeof(ALLEGRO_VERTEX) * ARRAY_SIZE(bullet_v)
+           );
   }
 }
 
@@ -274,7 +333,8 @@ void asteroids_init()
       double start_x = 0.0 ; double start_y = rand_double(3.0, 12.0);
 
       asteroids[i].template_v[j] = 
-        (ALLEGRO_VERTEX) { .x = start_x, .y = start_y, .z = 0, .color = ERROR_COLOUR };
+        (ALLEGRO_VERTEX) { .x = start_x, .y = start_y, .z = 0,
+                           .color = ERROR_COLOUR };
 
       rotate2D(&asteroids[i].template_v[j], (j * (ALLEGRO_PI/3)));
 
@@ -285,7 +345,8 @@ void asteroids_init()
              final_y = asteroids[i].template_v[j].y + asteroids[i].y;
 
       asteroids[i].transformed_v[j] = 
-        (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0, .color = ASTEROID_COLOUR };
+        (ALLEGRO_VERTEX) { .x = final_x, .y = final_y, .z = 0,
+                           .color = ASTEROID_COLOUR };
     }
 
     for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
@@ -312,8 +373,11 @@ void nac_boards_init()
     {
       nac_boards[i][j].length = 120;
       nac_boards[i][j].winner = 0;
-      nac_boards[i][j].x_0 = u_nac_board.x_0 + (nac_boards[i][j].length + 2*u_nac_board.padding) * i;
-      nac_boards[i][j].y_0 = u_nac_board.y_0 + (nac_boards[i][j].length + 2*u_nac_board.padding) * j;
+
+      double board_offset = nac_boards[i][j].length + 2*u_nac_board.padding;
+      nac_boards[i][j].x_0 = u_nac_board.x_0 + board_offset * i;
+      nac_boards[i][j].y_0 = u_nac_board.y_0 + board_offset * j;
+
       nac_boards[i][j].padding = 20.0;
       for (int k = 0; k < 3; k++)
       {
@@ -323,13 +387,13 @@ void nac_boards_init()
           nac_boards[i][j].cells[k][l].length = nac_boards[i][j].length / 3;
 
           nac_boards[i][j].cells[k][l].x_0 = nac_boards[i][j].x_0 +
-                                             nac_boards[i][j].padding + 
-                                             nac_boards[i][j].cells[k][l].length 
+                                             nac_boards[i][j].padding +
+                                             nac_boards[i][j].cells[k][l].length
                                              * k;
 
-          nac_boards[i][j].cells[k][l].y_0 = nac_boards[i][j].y_0 + 
-                                             nac_boards[i][j].padding + 
-                                             nac_boards[i][j].cells[k][l].length 
+          nac_boards[i][j].cells[k][l].y_0 = nac_boards[i][j].y_0 +
+                                             nac_boards[i][j].padding +
+                                             nac_boards[i][j].cells[k][l].length
                                              * l;
         }
       }
@@ -347,26 +411,32 @@ void bullets_add(SHIP* ship)
 
     bullets[i].used = true;
     bullets[i].timer = 0.0;
-    bullets[i].x = ship->transformed_v[0].x ; bullets[i].y = ship->transformed_v[0].y;
+
+    bullets[i].x = ship->transformed_v[0].x;
+    bullets[i].y = ship->transformed_v[0].y;
     bullets[i].r = ship->r;
-    bullets[i].dx = ship->dx + 5.0*cos(ship->r) ; bullets[i].dy = ship->dy + 5.0*sin(ship->r);
+
+    bullets[i].dx = ship->dx + 5.0*cos(ship->r);
+    bullets[i].dy = ship->dy + 5.0*sin(ship->r);
 
     for (int j = 0; j < ARRAY_SIZE(bullet_v); j++)
     {
       bullets[i].transformed_v[j].color = ship->transformed_v[0].color;
     }
 
-    ship->dx -= 5.0 * 0.1 * cos(ship->r) ; ship->dy -= 5.0 * 0.1 * sin(ship->r);
+    ship->dx -= 5.0 * 0.1 * cos(ship->r);
+    ship->dy -= 5.0 * 0.1 * sin(ship->r);
+
     break;
   }
 
-  al_play_sample(sample_fire, 
-      0.6,
-      0.0,
-      1.5,
-      ALLEGRO_PLAYMODE_ONCE,
-      NULL
-      );
+  al_play_sample(sample_fire,
+                 0.6,
+                 0.0,
+                 1.5,
+                 ALLEGRO_PLAYMODE_ONCE,
+                 NULL
+                 );
 }
 
 void charge_set(SHIP* ship)
@@ -411,8 +481,8 @@ bool asteroid_collision(double x, double y)
 {
   for (int i = 0; i < ASTEROIDS_COUNT; i++)
   {
-    if (circular_collision(asteroids[i].x, asteroids[i].y, x, y)
-        && DEBUG_NO_ASTEROID_COLLISION)
+    if (circular_collision(asteroids[i].x, asteroids[i].y, x, y) &&
+        DEBUG_NO_ASTEROID_COLLISION)
       return true;
   }
 
@@ -426,14 +496,23 @@ bool within_nac_board(double x, double y, int mark)
     {
         for (int j = 0; j <= 2; j++)
         {
-            if (x > nac_boards[i][j].x_0 &&
-                x < nac_boards[i][j].x_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
-                y > nac_boards[i][j].y_0 &&
-                y < nac_boards[i][j].y_0 + nac_boards[i][j].length + u_nac_board.padding*2 &&
-                nac_boards[i][j].winner == 0 &&
-                (&nac_boards[i][j] == active_grid || active_grid == NULL))
+            NAC_BOARD* current_board = &nac_boards[i][j];
+
+            double padded_length = current_board->length + 
+                                   u_nac_board.padding*2;
+
+            bool within_x = (x > current_board->x_0) && 
+                            (x < current_board->x_0 + padded_length);
+
+            bool within_y = (y > current_board->y_0) && 
+                            (y < current_board->y_0 + padded_length);
+
+            if (within_x &&
+                within_y &&
+                current_board->winner == 0 &&
+                (current_board == active_grid || active_grid == NULL))
             {
-              return within_cell(x, y, &nac_boards[i][j], mark);
+              return within_cell(x, y, current_board, mark);
             }
         }
     }
@@ -554,9 +633,7 @@ void main_menu_update()
   }
   //Exit
   if (key[ALLEGRO_KEY_ENTER])
-  {
     current_screen = GAME;
-  }
 }
 
 void menu_asteroid_update(MENU_ASTEROID* menu_asteroid) {
@@ -761,16 +838,9 @@ void ship_update(SHIP* ship)
 
   ship->fire_delay -= 0.1;
 
-  // Move ship's transform
-  for (int i = 0; i < ARRAY_SIZE(ship_v); i++)
-  {
-    ship->transformed_v[i].x = ship_v[i].x;
-    ship->transformed_v[i].y = ship_v[i].y;
-
-    rotate2D(&ship->transformed_v[i], ship->r);
-
-    ship->transformed_v[i].x += ship->x ; ship->transformed_v[i].y += ship->y;
-  }
+  move_transform(ship_v, ship->transformed_v,
+                 ARRAY_SIZE(ship_v),
+                 ship->x, ship->y, ship->r);
 }
 
 void bullets_update()
@@ -799,16 +869,9 @@ void bullets_update()
       continue;
     }
 
-
-    for (int j = 0; j < ARRAY_SIZE(bullet_v); j++)
-    {
-      bullets[i].transformed_v[j].x = bullet_v[j].x;
-      bullets[i].transformed_v[j].y = bullet_v[j].y;
-
-      rotate2D(&bullets[i].transformed_v[j], bullets[i].r);
-
-      bullets[i].transformed_v[j].x += bullets[i].x ; bullets[i].transformed_v[j].y += bullets[i].y;
-    }
+    move_transform(bullet_v, bullets[i].transformed_v,
+                   ARRAY_SIZE(bullet_v),
+                   bullets[i].x, bullets[i].y, bullets[i].r);
   }
 }
 
@@ -849,7 +912,9 @@ void asteroids_update()
 {
   for (int i = 0; i < ASTEROIDS_COUNT; i++)
   {
-    asteroids[i].x += asteroids[i].dx; asteroids[i].y += asteroids[i].dy ; asteroids[i].r += asteroids[i].dr;
+    asteroids[i].x += asteroids[i].dx;
+    asteroids[i].y += asteroids[i].dy;
+    asteroids[i].r += asteroids[i].dr;
   
     screen_wrap(&asteroids[i].x, &asteroids[i].y);
 
@@ -859,15 +924,9 @@ void asteroids_update()
         asteroid_collision(asteroids[i].x, asteroids[i].y))
       ;
 
-    for (int j = 0; j < ASTEROID_VERTICES_COUNT; j++)
-    {
-      asteroids[i].transformed_v[j].x = asteroids[i].template_v[j].x;
-      asteroids[i].transformed_v[j].y = asteroids[i].template_v[j].y;
-
-      rotate2D(&asteroids[i].transformed_v[j], asteroids[i].r);
-
-      asteroids[i].transformed_v[j].x += asteroids[i].x ; asteroids[i].transformed_v[j].y += asteroids[i].y;
-    }
+    move_transform(asteroids[i].template_v, asteroids[i].transformed_v,
+                   ARRAY_SIZE(asteroids[i].template_v),
+                   asteroids[i].x, asteroids[i].y, asteroids[i].r);
   }
 }
 
@@ -938,28 +997,34 @@ void nac_boards_draw()
   {
     for (int j = 0; j < 3; j++)
     {
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding,
-          nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
+      NAC_BOARD* current_board = &nac_boards[i][j];
+
+      al_draw_line(
+          current_board->x_0 + u_nac_board.padding + current_board->length/3,
+          current_board->y_0 + u_nac_board.padding,
+          current_board->x_0 + u_nac_board.padding + current_board->length/3,
+          current_board->y_0 + u_nac_board.padding + current_board->length,
           NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding,
-          nac_boards[i][j].x_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length,
+      al_draw_line(
+          current_board->x_0 + u_nac_board.padding + 2*current_board->length/3,
+          current_board->y_0 + u_nac_board.padding,
+          current_board->x_0 + u_nac_board.padding + 2*current_board->length/3,
+          current_board->y_0 + u_nac_board.padding + current_board->length,
           NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
-          nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
-          nac_boards[i][j].y_0 + u_nac_board.padding + nac_boards[i][j].length/3,
+      al_draw_line(
+          current_board->x_0 + u_nac_board.padding,
+          current_board->y_0 + u_nac_board.padding + current_board->length/3,
+          current_board->x_0 + u_nac_board.padding + current_board->length,
+          current_board->y_0 + u_nac_board.padding + current_board->length/3,
           NAC_BOARD_COLOUR, 1);
 
-      al_draw_line(nac_boards[i][j].x_0 + u_nac_board.padding,
-          nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
-          nac_boards[i][j].x_0 + u_nac_board.padding + nac_boards[i][j].length,
-          nac_boards[i][j].y_0 + u_nac_board.padding + 2*nac_boards[i][j].length/3,
+      al_draw_line(
+          current_board->x_0 + u_nac_board.padding,
+          current_board->y_0 + u_nac_board.padding + 2*current_board->length/3,
+          current_board->x_0 + u_nac_board.padding + current_board->length,
+          current_board->y_0 + u_nac_board.padding + 2*current_board->length/3,
           NAC_BOARD_COLOUR, 1);
 
       // Drawing the board marks
@@ -1086,8 +1151,8 @@ void asteroids_draw()
 void border_draw()
 {
   double x_0 = BORDER_PADDING,
-         y_0 = BORDER_PADDING;
-  double x_1 = BORDER_LENGTH + BORDER_PADDING,
+         y_0 = BORDER_PADDING,
+         x_1 = BORDER_LENGTH + BORDER_PADDING,
          y_1 = BORDER_LENGTH + BORDER_PADDING;
 
   al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 1, 1), 1);
