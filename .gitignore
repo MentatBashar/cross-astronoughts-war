@@ -1,5 +1,5 @@
-# Build directory
-build/
+# bin directory
+bin/
 
 # MacOS Files
 *.DS_Store
