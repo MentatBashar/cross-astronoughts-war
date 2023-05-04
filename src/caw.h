@@ -219,8 +219,7 @@ bool bullet_collision(double x, double y);
 bool charge_collision(double x, double y);
 bool asteroid_collision(double x, double y);
 
-bool within_nac_board(double x, double y, int mark);
-bool within_cell(double x, double y, NAC_BOARD* board, int mark);
+bool within_cell(double x, double y, int mark);
 void check_nac_board(NAC_BOARD* board, int mark);
 
 void keyboard_update(ALLEGRO_EVENT* event);
@@ -243,9 +242,11 @@ void menu_asteroid_draw(MENU_ASTEROID* menu_asteroid);
 void game_draw();
 
 void nac_boards_draw();
+void nac_boards_mark();
 
-void x_draw(double x_0, double y_0, bool is_big);
-void o_draw(double x_0, double y_0, bool is_big);
+void x_draw(double x_0, double y_0);
+void o_draw(double x_0, double y_0);
+
 
 void ship_draw();
 void bullets_draw();
