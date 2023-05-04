@@ -1016,7 +1016,7 @@ void nac_boards_mark()
           {
             if (nac_boards[i][j].cells[k][l].state == 1)
             {
-              printf("%s%d%d\n", "Mark in cell: ", k, l);
+              printf("Mark in cell: %d%d\n", k, l);
               o_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0);
             }
             else if (nac_boards[i][j].cells[k][l].state == 2)
@@ -1032,17 +1032,25 @@ void nac_boards_mark()
         {
           for (int l = 0; l < 3; l++)
           {
+            ALLEGRO_COLOR* cell_colour = &ERROR_COLOUR;
             if (nac_boards[i][j].cells[k][l].state == 1)
             {
-              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(0, 0, 255), 1);
+              cell_colour = &P1_COLOUR;
             }
             else if (nac_boards[i][j].cells[k][l].state == 2)
             {
-              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(255, 0, 0), 1);
+              cell_colour = &P2_COLOUR;
             }
-            else {
-              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(0, 255, 0), 1);
+            else
+            {
+              cell_colour = &DEBUG_COLLIDER_COLOUR;
             }
+            al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1),
+                nac_boards[i][j].y_0 + 6*(2*l + 1),
+                nac_boards[i][j].x_0 + 6*(2*k + 2),
+                nac_boards[i][j].y_0 + 6*(2*l + 2),
+                *cell_colour,
+                1);
           }
         }
       }
