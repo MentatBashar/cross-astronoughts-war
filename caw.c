@@ -955,6 +955,7 @@ void menu_asteroid_draw(MENU_ASTEROID* menu_asteroid)
 void game_draw()
 {
   nac_boards_draw();
+  nac_boards_mark();
 
   ship_draw();
   bullets_draw();
@@ -1081,6 +1082,55 @@ void nac_boards_draw()
     al_draw_rectangle(x_0, y_0, x_1, y_1, al_map_rgb_f(0, 1, 0), 1);
   }
 }
+
+void nac_boards_mark()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      if(&nac_boards[i][j] == active_grid)
+      {
+        for(int k = 0; k < 3; k++)
+        {
+          for(int l = 0; l < 3; l++)
+          {
+            if (nac_boards[i][j].cells[k][l].state == 1)
+            {
+              printf("%s%d%d\n", "Mark in cell: ", k, l);
+              o_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0, false);
+            }
+            else if (nac_boards[i][j].cells[k][l].state == 2)
+            {
+              x_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0, false);
+            }
+          }
+        }
+      }
+      else
+      {
+        for (int k = 0; k < 3; k++)
+        {
+          for (int l = 0; l < 3; l++)
+          {
+            if (nac_boards[i][j].cells[k][l].state == 1)
+            {
+              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(0, 0, 255), 1);
+            }
+            else if (nac_boards[i][j].cells[k][l].state == 2)
+            {
+              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(255, 0, 0), 1);
+            }
+            else {
+              al_draw_rectangle(nac_boards[i][j].x_0 + 6*(2*k + 1), nac_boards[i][j].y_0 + 6*(2*l + 1), nac_boards[i][j].x_0 + 6*(2*k + 2), nac_boards[i][j].y_0 + 6*(2*l + 2), al_map_rgb(0, 255, 0), 1);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 
 void x_draw(double x_0, double y_0, bool is_big)
 {

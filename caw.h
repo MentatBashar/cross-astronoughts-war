@@ -243,8 +243,11 @@ void menu_asteroid_draw(MENU_ASTEROID* menu_asteroid);
 void game_draw();
 
 void nac_boards_draw();
+void nac_boards_mark();
+
 void x_draw(double x_0, double y_0, bool is_big);
 void o_draw(double x_0, double y_0, bool is_big);
+
 
 void ship_draw();
 void bullets_draw();
