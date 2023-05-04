@@ -490,7 +490,7 @@ bool asteroid_collision(double x, double y)
 }
 
 
-bool within_nac_board(double x, double y, int mark)
+bool within_cell(double x, double y, int mark)
 {
   for (int i = 0; i <= 2; i++)
   {
@@ -509,42 +509,27 @@ bool within_nac_board(double x, double y, int mark)
 
       if (within_x &&
           within_y &&
-          current_board->winner == 0 &&
-          (current_board == active_grid || active_grid == NULL))
+          current_board->winner == 0)
+          //(current_board == active_grid || active_grid == NULL))
       {
-        return within_cell(x, y, current_board, mark);
-      }
-    }
-  }
+        // Mark and active grid
+        if (active_grid == NULL)
+          active_grid = &nac_boards[i][j];
+        else if (active_grid->cells[i][j].state == 0)
+        {
+          // Set cell's mark to be charge's last owner
+          active_grid->cells[i][j].state = mark;
 
-  return false;
-}
+          active_grid->marks++;
 
-bool within_cell(double x, double y, NAC_BOARD* board, int mark)
-{
-  for (int k = 0; k <= 2; k++)
-  {
-    for (int l = 0; l <= 2; l++)
-    {
-      if (x > board->cells[k][l].x_0 &&
-          x < board->cells[k][l].x_0 + board->cells[k][l].length &&
-          y > board->cells[k][l].y_0 &&
-          y < board->cells[k][l].y_0 + board->cells[k][l].length &&
-          board->cells[k][l].state == 0)
-      {
-        // Set cell's mark to be charge's last owner
-        board->cells[k][l].state = mark;
+          // Set new active grid
+          if (current_board->marks >= 9)
+            active_grid = NULL;
+          else
+            active_grid = &nac_boards[i][j];
 
-        board->marks++;
-
-        // Set new active grid
-        if (board->marks >= 9)
-          active_grid = NULL;
-        else
-          active_grid = &nac_boards[k][l];
-
-        check_nac_board(board, mark);
-
+          check_nac_board(current_board, mark);
+        }
         return true;
       }
     }
@@ -899,7 +884,7 @@ void charge_update()
 
   if (charge.dx == 0.0 && charge.dy == 0.0 && charge.last_touch != 0)
   {
-    if(within_nac_board(charge.x, charge.y, charge.last_touch))
+    if(within_cell(charge.x, charge.y, charge.last_touch))
         charge_init();
 
     charge.last_touch = 0;
@@ -993,72 +978,6 @@ void nac_boards_draw()
       u_nac_board.y_0 + 2*u_nac_board.length/3,
       U_NAC_BOARD_COLOUR, 1);
 
-  // Draw nac_boards
-  for (int i = 0; i < 3; i++)
-  {
-    for (int j = 0; j < 3; j++)
-    {
-      NAC_BOARD* current_board = &nac_boards[i][j];
-
-      al_draw_line(
-          current_board->x_0 + u_nac_board.padding + current_board->length/3,
-          current_board->y_0 + u_nac_board.padding,
-          current_board->x_0 + u_nac_board.padding + current_board->length/3,
-          current_board->y_0 + u_nac_board.padding + current_board->length,
-          NAC_BOARD_COLOUR, 1);
-
-      al_draw_line(
-          current_board->x_0 + u_nac_board.padding + 2*current_board->length/3,
-          current_board->y_0 + u_nac_board.padding,
-          current_board->x_0 + u_nac_board.padding + 2*current_board->length/3,
-          current_board->y_0 + u_nac_board.padding + current_board->length,
-          NAC_BOARD_COLOUR, 1);
-
-      al_draw_line(
-          current_board->x_0 + u_nac_board.padding,
-          current_board->y_0 + u_nac_board.padding + current_board->length/3,
-          current_board->x_0 + u_nac_board.padding + current_board->length,
-          current_board->y_0 + u_nac_board.padding + current_board->length/3,
-          NAC_BOARD_COLOUR, 1);
-
-      al_draw_line(
-          current_board->x_0 + u_nac_board.padding,
-          current_board->y_0 + u_nac_board.padding + 2*current_board->length/3,
-          current_board->x_0 + u_nac_board.padding + current_board->length,
-          current_board->y_0 + u_nac_board.padding + 2*current_board->length/3,
-          NAC_BOARD_COLOUR, 1);
-
-      // Drawing the board marks
-      if (nac_boards[i][j].winner == 1)
-        o_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0, true);
-      else if (nac_boards[i][j].winner == 2)
-        x_draw(nac_boards[i][j].x_0, nac_boards[i][j].y_0, true);
-
-      // Drawing the cell marks
-      for (int k = 0; k < 3; k++)
-      {
-        for (int l = 0; l < 3; l++)
-        {
-          if (!nac_boards[i][j].winner)
-          {
-            switch (nac_boards[i][j].cells[k][l].state)
-            {
-              case 1:
-                o_draw(nac_boards[i][j].cells[k][l].x_0, 
-                       nac_boards[i][j].cells[k][l].y_0,
-                       false);
-                break;
-              case 2:
-                x_draw(nac_boards[i][j].cells[k][l].x_0, 
-                       nac_boards[i][j].cells[k][l].y_0,
-                       false);
-                break;
-            }
-          }
-        }
-      }
-    }
-  }
 
   // Draw square around active grid
   if (active_grid == NULL)
@@ -1098,11 +1017,11 @@ void nac_boards_mark()
             if (nac_boards[i][j].cells[k][l].state == 1)
             {
               printf("%s%d%d\n", "Mark in cell: ", k, l);
-              o_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0, false);
+              o_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0);
             }
             else if (nac_boards[i][j].cells[k][l].state == 2)
             {
-              x_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0, false);
+              x_draw(nac_boards[k][l].x_0, nac_boards[k][l].y_0);
             }
           }
         }
@@ -1132,33 +1051,33 @@ void nac_boards_mark()
 }
 
 
-void x_draw(double x_0, double y_0, bool is_big)
+void x_draw(double x_0, double y_0)
 {
-  x_0 += 10 + (2 * is_big);
-  y_0 += 10 + (2 * is_big);
+  x_0 += 10 * 3;
+  y_0 += 10 * 3;
 
-  double x_1 = x_0 + 20 + (4 * is_big),
-         y_1 = y_0 + 20 + (4 * is_big);
+  double x_1 = x_0 + 20 * 5,
+         y_1 = y_0 + 20 * 5,
+         w = 2.5;
 
-  double w = 1 + (1.5 * is_big);
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), w);
 
-  x_0 += 20 + (4 * is_big);
-  x_1 -= 20 + (4 * is_big);
+  x_0 += 20 * 5;
+  x_1 -= 20 * 5;
   al_draw_line(x_0, y_0, x_1, y_1, al_map_rgb_f(1, 0, 0), w);
 }
 
-void o_draw(double x_0, double y_0, bool is_big)
+void o_draw(double x_0, double y_0)
 {
-  x_0 += 10 + (2 * is_big);
-  y_0 += 10 + (2 * is_big);
+  x_0 += 10 * 3;
+  y_0 += 10 * 3; 
 
-  double r = 10 + (4 * is_big);
+  double r = 10 * 5;
 
   x_0 += r;
   y_0 += r;
 
-  double w = 1 + (1.5 * is_big);
+  double w = 2.5;
   al_draw_circle(x_0, y_0, r, al_map_rgb_f(0, 0, 1), w);
 }
 
