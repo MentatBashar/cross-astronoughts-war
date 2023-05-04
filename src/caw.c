@@ -165,7 +165,7 @@ void audio_init()
   must_init(al_init_acodec_addon(), "audio codecs");
   must_init(al_reserve_samples(128), "reserve samples");
 
-  sample_fire = al_load_sample("fire.flac");
+  sample_fire = al_load_sample("../resources/fire.flac");
   must_init(sample_fire, "fire sample");
 }
 
@@ -181,7 +181,7 @@ void keyboard_init()
 
 void main_menu_init()
 {
-  main_menu = al_load_bitmap("images/main_menu.png");
+  main_menu = al_load_bitmap("../resources/images/main_menu.png");
   must_init(main_menu, "main_menu");
   for(int i = 0; i < 6; i++) {
     menu_asteroid_init(&menu_asteroids[i]);
@@ -201,7 +201,7 @@ void menu_asteroid_init(MENU_ASTEROID* menu_asteroid)
   //Timer controls framerate, frame controls which png is displayed
   menu_asteroid->timer = 0;
   menu_asteroid->frame = 0;
-  menu_asteroid->image = al_load_bitmap("images/rock_frames/R0.png");
+  menu_asteroid->image = al_load_bitmap("../resources/images/rock_frames/R0.png");
   must_init(menu_asteroid->image, "asteroid");
 }
 
@@ -664,8 +664,8 @@ void menu_asteroid_update(MENU_ASTEROID* menu_asteroid) {
   //Switch frames
   if(change_frame)
   {
-    char path[] = "images/rock_frames/";
-    char new_path[26];
+    char path[] = "../resources/images/rock_frames/";
+    char new_path[60];
     strcpy(new_path, path);
     switch (menu_asteroid->frame)
     {

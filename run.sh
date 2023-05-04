@@ -1,1 +1,1 @@
-cd build && ./caw && cd ..
+cd bin && ./caw && cd ..
