@@ -1,1 +1,1 @@
-cd bin && ./caw && cd ..
+cd bin && ./caw $* && cd ..
