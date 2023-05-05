@@ -11,4 +11,5 @@ clean:
 	-rm $(BIN)
 
 caw: src/caw.c src/caw.h
+	mkdir -p bin/
 	${CC} ${SOURCE} ${CCFLAGS} ${AL} -o ${BIN}
